@@ -5,24 +5,8 @@ milestone yang isinya hanya "menyiapkan struktur".
 
 Estimasi memakai satuan relatif (S/M/L), bukan tanggal, karena kecepatan pengerjaan belum diketahui.
 
-> **M0, M1 dan M2 sudah selesai** — rinciannya di
+> **M0–M3 sudah selesai** — rinciannya di
 > [`Documentation/07-changelog.md`](../Documentation/07-changelog.md).
-
----
-
-## M3 — Renderer Markdown + HTML · M
-
-Sengaja **didahulukan sebelum editor**: renderer bisa dites tanpa UI, dan begitu jadi, editor punya
-sesuatu untuk ditampilkan sebagai preview.
-
-- [ ] Compiler: band diulang per baris, grouping, agregat (`sum`, `avg`, `count`)
-- [ ] Evaluator ekspresi tersandbox + fungsi format lokal Indonesia (rupiah, tanggal, ribuan)
-- [ ] Renderer Markdown
-- [ ] Renderer HTML
-- [ ] Test snapshot untuk keduanya
-
-**Selesai bila:** `Report::make('x')->toMarkdown()` menghasilkan file MD benar dari data sungguhan.
-Di titik ini tujuan utama produk sudah terpenuhi, tanpa editor visual sekali pun.
 
 ---
 
@@ -78,17 +62,12 @@ Dikerjakan berdasarkan umpan balik pemakaian nyata, bukan tebakan:
 
 ---
 
-## Urutan yang sengaja dipilih
+## Posisi sekarang
 
-Yang mungkin terasa berlawanan dengan intuisi: **renderer (M3) didahulukan sebelum editor (M4)**,
-padahal editor yang paling terlihat.
+Renderer sengaja didahulukan sebelum editor, dan itu terbukti tepat: setelah M3, produk sudah
+**berguna tanpa editor visual sama sekali** — template ditulis sebagai JSON dan report sudah
+keluar sebagai Markdown/HTML.
 
-Alasannya, editor tanpa renderer tidak bisa dibuktikan benar — yang terlihat hanya kotak-kotak yang
-bisa digeser. Sebaliknya, renderer tanpa editor sudah memberi nilai penuh: template bisa ditulis
-sebagai JSON — dan sejak M1 itu memang sudah bisa — sehingga report langsung bisa dihasilkan. Kalau
-anggaran waktu habis di tengah jalan, berhenti setelah M3 masih meninggalkan alat yang berguna;
-berhenti setelah M4-tanpa-M3 meninggalkan UI yang tidak menghasilkan apa-apa.
-
-Untuk produk yang dijual, **titik layak rilis paling awal adalah akhir M4**: pengguna bisa merancang
-report lewat UI dan mendapat keluaran MD/HTML. M5 (PDF) hampir pasti diminta pembeli, tapi tidak
-memblokir rilis pertama.
+Untuk produk yang dijual, **titik layak rilis paling awal adalah akhir M4**: pengguna bisa
+merancang report lewat UI dan mendapat keluaran. M5 (PDF) hampir pasti diminta pembeli, tapi
+tidak memblokir rilis pertama.

@@ -26,9 +26,15 @@ project, so treat the package as a distributable product rather than app code.
   `ReportData::eloquent()`; fields are declared one at a time with a required human label. Never widen
   that boundary for convenience — templates are user input, and `scope()` is what holds tenant and
   permission lines.
-- Status: M0–M2 done (storage, schema validation, panel CRUD, file loading, data sources). Next is
-  M3 — the compiler and the Markdown/HTML renderers. Nothing renders yet and `{{ ... }}` expressions
-  are stored verbatim, never evaluated.
+- **`{{ }}` expressions are a sandbox, not a template engine.** `ExpressionEvaluator` accepts a
+  field, a `params.`/`group.` reference, or an allow-listed aggregate, each optionally piped into one
+  allow-listed formatter — nothing else. Never widen it toward Blade, `eval`, or arbitrary PHP:
+  documents are user input that runs on buyers' servers.
+- **Renderers only translate.** `ReportCompiler` resolves everything first; a `RenderedReport` holds
+  no expressions, field references or database access. Keep new renderers free of both, and escape
+  all data — report rows come from the host's database.
+- Status: M0–M3 done (storage, validation, panel CRUD, data sources, compiler, Markdown/HTML). Next
+  is M4 — the visual editor. No PDF yet; relation fields cannot be sorted or filtered on.
 
 ## Laravel Boost
 

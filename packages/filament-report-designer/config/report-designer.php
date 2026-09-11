@@ -50,6 +50,35 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Formatting
+    |--------------------------------------------------------------------------
+    |
+    | How values are rendered by the "currency", "number", "date" and related
+    | formatters. These are plain PHP settings rather than ext-intl locales, so
+    | output does not change with the host's PHP build.
+    |
+    | For Indonesian formatting: symbol "Rp ", "," decimal, "." thousands,
+    | date "d/m/Y".
+    |
+    */
+
+    'formatting' => [
+        'decimals' => 2,
+        'decimal_separator' => '.',
+        'thousands_separator' => ',',
+
+        'currency_symbol' => '$',
+        'currency_symbol_after' => false,
+        'currency_decimals' => 2,
+
+        'percent_suffix' => '%',
+
+        'date_format' => 'Y-m-d',
+        'datetime_format' => 'Y-m-d H:i',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | File templates
     |--------------------------------------------------------------------------
     |

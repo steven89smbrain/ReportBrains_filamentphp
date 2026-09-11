@@ -4,6 +4,48 @@ Milestones as they complete. Roadmap for the unbuilt ones is in `Planning/04-roa
 
 ---
 
+## M3 — Compiler and renderers · 11 Sep 2026
+
+Reports now produce output. A template stored in the panel can be bound to data, compiled
+and written out as Markdown or HTML.
+
+**Expression evaluation**
+- `ExpressionEvaluator` understands exactly three forms — a field, a `params.`/`group.`
+  reference, and an aggregate — each optionally piped into one formatter
+- No arithmetic, no nesting, no method calls, no access to the container, facades or the
+  request. Documents are user input, so Blade and `eval` were never options
+- Aggregates `sum`, `avg`, `count`, `min`, `max`, scoped to the current band's rows
+- Unknown functions, formatters and references are refused rather than rendered empty
+
+**Formatting**
+- `currency`, `number`, `integer`, `percent`, `date`, `datetime`, `upper`, `lower`
+- Driven by config rather than `ext-intl`, which is not guaranteed on a buyer's server
+
+**Compiler**
+- Repeats the detail band per row, except for `table` blocks, which consume the whole row
+  set — a table is already a repeating structure
+- Splits rows by `group_by`, emitting header, detail and footer bands per group, with
+  aggregates scoped to that group
+- Refuses more than one grouping level rather than silently dropping the extras
+- Produces a `RenderedReport` that is pure data: no expressions, no field references, no
+  database access
+
+**Renderers**
+- `MarkdownRenderer` — tables with column alignment; escapes data, including the pipe, so a
+  value cannot split a column. Page setup is skipped, since Markdown has no pages
+- `HtmlRenderer` — full document or embeddable fragment, band-scoped CSS classes, and every
+  value escaped so report data cannot become markup
+
+**Tests** — 52 added, including an end-to-end pass from a stored template through a scoped
+data source to grouped Markdown, plus XSS and Markdown-injection cases.
+
+### Not included
+
+PDF output (M5) and the visual editor (M4). Relation fields still cannot be sorted or
+filtered on.
+
+---
+
 ## M2 — Data sources · 11 Sep 2026
 
 Reports can now be bound to data, through a whitelist the developer controls.

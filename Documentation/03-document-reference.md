@@ -171,12 +171,8 @@ Takes no other keys.
 
 ## Expressions
 
-`{{ ... }}` placeholders are stored verbatim in version 1 and are **not yet evaluated**.
-The evaluator lands in M3. When it does, it will be a restricted expression language with
-an allow-list of functions — not Blade and not `eval`, because documents are user input
-and evaluating them as code would be a remote code execution path.
-
-Planned forms:
+`{{ ... }}` placeholders are evaluated by a deliberately tiny, sandboxed language — see
+[Expressions and rendering](09-expressions-and-rendering.md).
 
 | Expression | Meaning |
 |---|---|
@@ -184,7 +180,10 @@ Planned forms:
 | `{{ total }}` | A field on the current row |
 | `{{ customer.name }}` | A field across a relation |
 | `{{ group.value }}` | The current group's value |
-| `{{ sum(total) }}` | An aggregate over the current band's rows |
+| `{{ sum(total) }}` | An aggregate over the rows in scope |
+| `{{ sum(total) \| currency }}` | Any of the above, formatted |
+
+There is no arithmetic, no nesting and no method calls. Anything else is refused.
 
 ## Versioning
 

@@ -3,8 +3,8 @@
 A Filament plugin for designing reports. Templates are stored as JSON documents and
 are rendered to Markdown, HTML, PDF or spreadsheets.
 
-> **Status: in development.** Templates can be stored, validated and bound to a data
-> source today. The visual editor and the renderers do not exist yet — see
+> **Status: in development.** Reports can be written, bound to data and rendered to
+> Markdown or HTML today. The visual editor and PDF output do not exist yet — see
 > [What works today](#what-works-today).
 > This documentation only describes behaviour that is implemented and covered by tests.
 
@@ -20,6 +20,7 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | [06 — Architecture](06-architecture.md) | How the pieces fit together, and why |
 | [07 — Changelog](07-changelog.md) | What shipped in each milestone |
 | [08 — Data sources](08-data-sources.md) | Exposing data to reports, safely |
+| [09 — Expressions and rendering](09-expressions-and-rendering.md) | The `{{ }}` language, formatting, and the Markdown/HTML renderers |
 
 ## What works today
 
@@ -33,7 +34,9 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | Drag-and-drop visual editor | ⏳ Planned (M4) |
 | Register data sources with a field whitelist | ✅ Working |
 | Scopes, row caps and parameter validation | ✅ Working |
-| Markdown / HTML rendering | ⏳ Planned (M3) |
+| Markdown and HTML rendering | ✅ Working |
+| Sandboxed `{{ }}` expressions and aggregates | ✅ Working |
+| Grouping with subtotals and grand totals | ✅ Working |
 | PDF rendering | ⏳ Planned (M5) |
 
 Planning documents for the unbuilt milestones live in `Planning/`.

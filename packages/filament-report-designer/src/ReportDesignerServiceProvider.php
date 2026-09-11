@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace ReportBrains\ReportDesigner;
 
 use Illuminate\Support\ServiceProvider;
+use ReportBrains\ReportDesigner\Compiler\ReportCompiler;
 use ReportBrains\ReportDesigner\DataSources\DataSourceRegistry;
 use ReportBrains\ReportDesigner\DataSources\ReportQueryFactory;
+use ReportBrains\ReportDesigner\Expressions\ExpressionEvaluator;
+use ReportBrains\ReportDesigner\Expressions\ValueFormatter;
 use ReportBrains\ReportDesigner\Schema\DocumentFields;
 use ReportBrains\ReportDesigner\Schema\ReportSchema;
 
@@ -28,6 +31,9 @@ class ReportDesignerServiceProvider extends ServiceProvider
         $this->app->singleton(TemplateRepository::class);
         $this->app->singleton(DataSourceRegistry::class);
         $this->app->singleton(ReportQueryFactory::class);
+        $this->app->singleton(ValueFormatter::class);
+        $this->app->singleton(ExpressionEvaluator::class);
+        $this->app->singleton(ReportCompiler::class);
     }
 
     public function boot(): void
