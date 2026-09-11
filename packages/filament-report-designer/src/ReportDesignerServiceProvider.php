@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ReportBrains\ReportDesigner;
 
 use Illuminate\Support\ServiceProvider;
+use ReportBrains\ReportDesigner\Schema\ReportSchema;
 
 class ReportDesignerServiceProvider extends ServiceProvider
 {
@@ -13,14 +14,25 @@ class ReportDesignerServiceProvider extends ServiceProvider
      */
     public const VIEW_NAMESPACE = 'report-designer';
 
+    private const CONFIG_PATH = __DIR__.'/../config/report-designer.php';
+
     public function register(): void
     {
-        //
+        $this->mergeConfigFrom(self::CONFIG_PATH, 'report-designer');
+
+        $this->app->singleton(ReportSchema::class);
+        $this->app->singleton(TemplateRepository::class);
     }
 
     public function boot(): void
     {
-        $this->loadViewsFrom(__DIR__.'/../resources/views', static::VIEW_NAMESPACE);
+        $this->loadViewsFrom(__DIR__.'/../resources/views', self::VIEW_NAMESPACE);
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                self::CONFIG_PATH => config_path('report-designer.php'),
+            ], 'report-designer-config');
+        }
     }
 }

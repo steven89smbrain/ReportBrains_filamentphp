@@ -1,0 +1,46 @@
+{
+    "schema_version": 1,
+    "key": "monthly-sales",
+    "title": "Monthly Sales",
+    "params": [
+        { "name": "from", "type": "date", "label": "From date", "required": true },
+        { "name": "to", "type": "date", "label": "To date", "required": true }
+    ],
+    "data": {
+        "source": "sales",
+        "sort": [{ "field": "created_at", "dir": "desc" }],
+        "group_by": ["branch.name"]
+    },
+    "page": {
+        "size": "A4",
+        "orientation": "portrait",
+        "margin": { "top": 20, "right": 15, "bottom": 20, "left": 15 }
+    },
+    "bands": {
+        "document_header": [
+            { "type": "heading", "level": 1, "content": "Monthly Sales" },
+            { "type": "text", "content": "Period {{ params.from }} to {{ params.to }}" },
+            { "type": "divider" }
+        ],
+        "group_header": [
+            { "type": "heading", "level": 2, "content": "Branch: {{ group.value }}" }
+        ],
+        "detail": [
+            {
+                "type": "table",
+                "columns": [
+                    { "field": "invoice_no", "label": "Invoice", "width": "20%" },
+                    { "field": "customer.name", "label": "Customer" },
+                    { "field": "total", "label": "Total", "align": "right", "format": "currency" }
+                ]
+            }
+        ],
+        "group_footer": [
+            { "type": "text", "content": "Subtotal: {{ sum(total) }}", "align": "right", "bold": true }
+        ],
+        "document_footer": [
+            { "type": "divider" },
+            { "type": "text", "content": "Grand total: {{ sum(total) }}", "align": "right", "bold": true }
+        ]
+    }
+}

@@ -30,10 +30,15 @@ class ReportDesignerPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        $panel->discoverPages(
-            in: __DIR__.'/Filament/Pages',
-            for: 'ReportBrains\\ReportDesigner\\Filament\\Pages',
-        );
+        $panel
+            ->discoverResources(
+                in: __DIR__.'/Filament/Resources',
+                for: 'ReportBrains\\ReportDesigner\\Filament\\Resources',
+            )
+            ->discoverPages(
+                in: __DIR__.'/Filament/Pages',
+                for: 'ReportBrains\\ReportDesigner\\Filament\\Pages',
+            );
     }
 
     public function boot(Panel $panel): void

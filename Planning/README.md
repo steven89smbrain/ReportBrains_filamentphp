@@ -1,29 +1,24 @@
-# Planning — Filament Report Designer
+# Planning — pekerjaan yang belum dikerjakan
 
-Folder ini berisi dokumen perencanaan plugin **report designer untuk FilamentPHP**.
+Folder ini hanya memuat **yang belum selesai**. Pekerjaan yang sudah jadi pindah ke
+[`Documentation/`](../Documentation/README.md) — lihat
+[changelog](../Documentation/07-changelog.md) untuk apa saja yang sudah rampung.
+
+Dokumen di sini sengaja tetap berbahasa Indonesia: ini catatan kerja internal, bukan
+bagian dari produk yang dijual. Semua yang menghadap pengguna (UI plugin dan
+`Documentation/`) berbahasa Inggris.
 
 | Dokumen | Isi |
 |---|---|
-| [01-status-pengerjaan.md](01-status-pengerjaan.md) | Kondisi repo saat ini, apa yang sudah ada, apa yang belum |
-| [02-analisa-dan-rekomendasi.md](02-analisa-dan-rekomendasi.md) | Analisa 3 poin rencana awal + rekomendasi perubahan |
-| [03-arsitektur.md](03-arsitektur.md) | Struktur package, skema JSON, alur render, keamanan |
-| [04-roadmap.md](04-roadmap.md) | Milestone M0–M7 dengan definition of done |
-| [05-keputusan-terbuka.md](05-keputusan-terbuka.md) | Keputusan yang masih perlu dijawab sebelum coding |
+| [02-ide-dan-risiko.md](02-ide-dan-risiko.md) | Ide yang belum dikerjakan dan risiko yang perlu diawasi |
+| [03-rancangan-belum-dibangun.md](03-rancangan-belum-dibangun.md) | Rancangan compiler, renderer, sumber data, API runtime |
+| [04-roadmap.md](04-roadmap.md) | Milestone M2–M7 |
+| [05-keputusan-terbuka.md](05-keputusan-terbuka.md) | Keputusan yang masih menggantung |
 
-## Ringkasan eksekutif
+## Posisi saat ini
 
-**Status:** belum ada kode plugin sama sekali. Repo masih skeleton Laravel 13.30.1 + Laravel Boost.
-Filament belum terpasang. Progres plugin: **0%**.
+**M0 dan M1 selesai.** Template report bisa ditulis, divalidasi, disimpan, dan dibaca
+kembali — lewat panel maupun dari file JSON. 38 test lulus.
 
-**Tiga rekomendasi terbesar** (detail di [02](02-analisa-dan-rekomendasi.md)):
-
-1. **JSON jadi satu-satunya sumber kebenaran, Markdown jadi salah satu exporter** — bukan dua format
-   setara. MD tidak bisa menyatakan kolom, page break, header/footer berulang, atau styling; kalau
-   diperlakukan setara, akan lahir dua model yang saling menyimpang.
-2. **Editor berbasis blok (flow), bukan kanvas absolut** — karena syarat "menghasilkan MD" hanya mungkin
-   kalau dokumen tersusun sebagai aliran blok. Kanvas koordinat-absolut ala Crystal Report hanya bisa
-   diekspor ke PDF.
-3. **Sumber data lewat registry yang di-whitelist di kode, bukan koneksi database bebas dari UI** —
-   editor membaca *metadata* skema, bukan mengeksekusi SQL karangan pengguna.
-
-**Keputusan teknis yang sudah terverifikasi:** target **Filament v5** (v5.7.8 resolve bersih di stack ini).
+**Berikutnya: M2 — sumber data.** Registry whitelist, introspeksi skema, perakit query,
+dan isolasi data. Inilah yang membuat template mulai terhubung ke data sungguhan.

@@ -5,32 +5,8 @@ milestone yang isinya hanya "menyiapkan struktur".
 
 Estimasi memakai satuan relatif (S/M/L), bukan tanggal, karena kecepatan pengerjaan belum diketahui.
 
----
-
-## M0 — Fondasi · S — **SELESAI** (11 Sep 2026)
-
-- [x] `git init` + commit awal, remote ke `ReportBrains_filamentphp`
-- [x] Filament v5.7.8 terpasang, panel admin di `/admin`
-- [x] `User` mengimplementasikan `FilamentUser` (lihat K8 — belum aman untuk produksi)
-- [x] Package `reportbrains/filament-report-designer` + path repository (symlink)
-- [x] Plugin terdaftar di panel, halaman `admin/reports` muncul dari namespace package
-- [x] 4 test membuktikan wiring: plugin terdaftar, page ditemukan, halaman render, akses tanpa login ditolak
-- [ ] Buat user admin — **perlu dijalankan sendiri** (pilih password Anda):
-      `php artisan make:filament-user`
-
-**Selesai bila:** panel Filament terbuka dan menu "Reports" tampil dari kode package, bukan dari `app/`. ✅
-
----
-
-## M1 — Template tersimpan · M
-
-- [ ] Skema JSON v1 + kelas validator
-- [ ] Migrasi `report_templates` (key, title, schema JSON, versi, timestamps)
-- [ ] Filament Resource untuk CRUD template (form biasa dulu, belum editor visual)
-- [ ] Loader yang bisa membaca template dari DB **dan** dari `resources/reports/*.json`
-- [ ] Test: template invalid ditolak dengan pesan yang jelas
-
-**Selesai bila:** template bisa dibuat, disimpan, dan dibaca kembali lewat kode.
+> **M0 dan M1 sudah selesai** — rinciannya di
+> [`Documentation/07-changelog.md`](../Documentation/07-changelog.md).
 
 ---
 
@@ -58,7 +34,7 @@ sesuatu untuk ditampilkan sebagai preview.
 - [ ] Test snapshot untuk keduanya
 
 **Selesai bila:** `Report::make('x')->toMarkdown()` menghasilkan file MD benar dari data sungguhan.
-Di titik ini poin 2 rencana awal sudah terpenuhi, tanpa editor visual sekali pun.
+Di titik ini tujuan utama produk sudah terpenuhi, tanpa editor visual sekali pun.
 
 ---
 
@@ -77,7 +53,7 @@ Di titik ini poin 2 rencana awal sudah terpenuhi, tanpa editor visual sekali pun
 
 ## M5 — PDF · M
 
-- [ ] Pilih paket PDF (uji `--dry-run` di PHP 8.5 dulu — lihat [05](05-keputusan-terbuka.md))
+- [ ] Pilih paket PDF (uji `--dry-run` di PHP 8.5 dulu — lihat K3 di [05](05-keputusan-terbuka.md))
 - [ ] Page setup: ukuran, orientasi, margin
 - [ ] Header/footer halaman + nomor halaman
 - [ ] Renderer PDF + test
@@ -92,7 +68,8 @@ Di titik ini poin 2 rencana awal sudah terpenuhi, tanpa editor visual sekali pun
 - [ ] Artisan `report:render`
 - [ ] Job antrian untuk report besar
 - [ ] Ekspor XLSX/CSV (`openspout` sudah ikut terpasang bersama Filament)
-- [ ] README package + dokumentasi pemakaian
+- [ ] Perbarui `Documentation/` untuk fitur M2–M6
+- [ ] Siapkan jalur distribusi berbayar (private Packagist / Anystack)
 - [ ] Tag rilis `v0.1.0`
 
 **Selesai bila:** plugin bisa dipasang di aplikasi Laravel+Filament lain dan langsung berfungsi.
@@ -120,6 +97,10 @@ padahal editor yang paling terlihat.
 
 Alasannya, editor tanpa renderer tidak bisa dibuktikan benar — yang terlihat hanya kotak-kotak yang
 bisa digeser. Sebaliknya, renderer tanpa editor sudah memberi nilai penuh: template bisa ditulis
-sebagai JSON dan report sudah bisa dihasilkan. Kalau anggaran waktu habis di tengah jalan, berhenti
-setelah M3 masih meninggalkan alat yang berguna; berhenti setelah M4-tanpa-M3 meninggalkan UI yang
-tidak menghasilkan apa-apa.
+sebagai JSON — dan sejak M1 itu memang sudah bisa — sehingga report langsung bisa dihasilkan. Kalau
+anggaran waktu habis di tengah jalan, berhenti setelah M3 masih meninggalkan alat yang berguna;
+berhenti setelah M4-tanpa-M3 meninggalkan UI yang tidak menghasilkan apa-apa.
+
+Untuk produk yang dijual, **titik layak rilis paling awal adalah akhir M4**: pengguna bisa merancang
+report lewat UI dan mendapat keluaran MD/HTML. M5 (PDF) hampir pasti diminta pembeli, tapi tidak
+memblokir rilis pertama.

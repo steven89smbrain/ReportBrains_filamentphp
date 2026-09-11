@@ -44,7 +44,41 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * A minimal report document that passes schema validation.
+ *
+ * Tests override only the part they are about, so a failure points at the
+ * change rather than at unrelated fixture noise.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function validReportDocument(array $overrides = []): array
 {
-    // ..
+    return array_replace_recursive([
+        'schema_version' => 1,
+        'key' => 'monthly-sales',
+        'title' => 'Monthly Sales',
+        'params' => [
+            ['name' => 'from', 'type' => 'date', 'label' => 'From', 'required' => true],
+        ],
+        'data' => [
+            'source' => 'sales',
+            'sort' => [['field' => 'created_at', 'dir' => 'desc']],
+        ],
+        'bands' => [
+            'document_header' => [
+                ['type' => 'heading', 'level' => 1, 'content' => 'Monthly Sales'],
+            ],
+            'detail' => [
+                [
+                    'type' => 'table',
+                    'columns' => [
+                        ['field' => 'invoice_no', 'label' => 'Invoice'],
+                        ['field' => 'total', 'label' => 'Total', 'align' => 'right'],
+                    ],
+                ],
+            ],
+        ],
+    ], $overrides);
 }

@@ -5,19 +5,25 @@ It is kept in sync with `AGENTS.md`; edit both together.
 
 ## Project state
 
-A Laravel 13 app that exists to host and develop **`reportbrains/filament-report-designer`** — a Filament
-plugin for designing reports. Planning documents live in `Planning/`; read
-`Planning/04-roadmap.md` for the milestone the work is currently on.
+A Laravel 13 app that exists to host and develop **`reportbrains/filament-report-designer`** — a
+commercial Filament plugin for designing reports. It is sold under a proprietary licence, one per
+project, so treat the package as a distributable product rather than app code.
 
 - **The plugin is the product; the app is the harness.** Plugin code belongs in
-  `packages/filament-report-designer/` (namespace `ReportBrains\ReportDesigner\`), not in `app/`. It is
-  linked through a composer path repository and symlinked into `vendor/`, so edits apply with no reinstall.
-- **Filament v5** with an admin panel at `/admin`. The plugin is registered from
-  `app/Providers/Filament/AdminPanelProvider.php` via `->plugin(ReportDesignerPlugin::make())`, and it
-  discovers its own pages from the package directory.
-- `User` implements `FilamentUser`. **`canAccessPanel()` currently returns `true` for everyone** — see
-  `Planning/05-keputusan-terbuka.md` (K8) before deploying anywhere real.
-- Status as of M0: panel and plugin wiring done and covered by tests. No report functionality yet.
+  `packages/filament-report-designer/` (namespace `ReportBrains\ReportDesigner\`), not in `app/`. It
+  is linked through a composer path repository and symlinked into `vendor/`, so edits apply with no
+  reinstall. Never assume the host application's table names, user model or tenant model.
+- **Filament v5**, admin panel at `/admin`, plugin registered from
+  `app/Providers/Filament/AdminPanelProvider.php`. It discovers its own resources and pages.
+- **Documents are validated at the storage boundary**, in `ReportTemplate::saving()` — not only in
+  the Filament form. Keep it that way: a malformed document that saves cleanly fails later, at
+  render time, where the cause is far harder to trace.
+- **Language split:** all shipped code, UI and `Documentation/` are in English. `Planning/` is
+  internal Indonesian working notes.
+- `Documentation/` describes only what is built and tested; `Planning/` holds what is not. Read
+  `Documentation/07-changelog.md` for what exists and `Planning/04-roadmap.md` for what is next.
+- Status: M0–M1 done (storage, schema validation, panel CRUD, file loading). Next is M2 — the data
+  source registry. There is no data binding and no rendering yet.
 
 ## Laravel Boost
 
