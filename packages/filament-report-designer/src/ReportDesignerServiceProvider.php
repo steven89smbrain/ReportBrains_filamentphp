@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace ReportBrains\ReportDesigner;
 
 use Illuminate\Support\ServiceProvider;
+use ReportBrains\ReportDesigner\DataSources\DataSourceRegistry;
+use ReportBrains\ReportDesigner\DataSources\ReportQueryFactory;
+use ReportBrains\ReportDesigner\Schema\DocumentFields;
 use ReportBrains\ReportDesigner\Schema\ReportSchema;
 
 class ReportDesignerServiceProvider extends ServiceProvider
@@ -21,7 +24,10 @@ class ReportDesignerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(self::CONFIG_PATH, 'report-designer');
 
         $this->app->singleton(ReportSchema::class);
+        $this->app->singleton(DocumentFields::class);
         $this->app->singleton(TemplateRepository::class);
+        $this->app->singleton(DataSourceRegistry::class);
+        $this->app->singleton(ReportQueryFactory::class);
     }
 
     public function boot(): void

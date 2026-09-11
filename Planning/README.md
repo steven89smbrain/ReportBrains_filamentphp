@@ -17,8 +17,9 @@ bagian dari produk yang dijual. Semua yang menghadap pengguna (UI plugin dan
 
 ## Posisi saat ini
 
-**M0 dan M1 selesai.** Template report bisa ditulis, divalidasi, disimpan, dan dibaca
-kembali — lewat panel maupun dari file JSON. 38 test lulus.
+**M0, M1 dan M2 selesai.** Template bisa ditulis, divalidasi, disimpan, dan kini terhubung
+ke data lewat registry sumber data yang di-whitelist. 70 test lulus.
 
-**Berikutnya: M2 — sumber data.** Registry whitelist, introspeksi skema, perakit query,
-dan isolasi data. Inilah yang membuat template mulai terhubung ke data sungguhan.
+**Berikutnya: M3 — compiler dan renderer Markdown + HTML.** Inilah milestone yang membuat
+report benar-benar menghasilkan keluaran. Setelah M3 selesai, tujuan utama produk sudah
+terpenuhi meski editor visual belum ada.

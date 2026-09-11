@@ -4,6 +4,48 @@ Milestones as they complete. Roadmap for the unbuilt ones is in `Planning/04-roa
 
 ---
 
+## M2 — Data sources · 11 Sep 2026
+
+Reports can now be bound to data, through a whitelist the developer controls.
+
+**Registry**
+- `ReportData` facade and `DataSourceRegistry`. Sources are registered in application code
+  and never from the panel
+- `DataSource` interface speaks in rows rather than query builders, so a source backed by a
+  view, stored procedure or remote API can implement it later without a redesign
+- `EloquentSource` is the implementation shipped today
+
+**The whitelist**
+- Fields are declared one at a time with a **required** human label, so adding a column to a
+  table never silently exposes it, and the designer never has to show `customer_id`
+- Relation fields via dot notation, eager-loaded and resolved in PHP rather than joined
+- Filter operators are constrained by field type — a date field cannot use `contains`
+- `scope()` applies on every read and cannot be removed by a report
+- `maxRows()` caps a report's rows; a query cannot raise the cap
+
+**Binding a document to data**
+- `ReportQueryFactory` turns a document plus runtime parameters into a validated
+  `ReportQuery`, checking every column, sort, group and filter against the whitelist
+- Parameters are validated against their declared types; undeclared ones are dropped rather
+  than passed through
+- `DocumentFields` collects the fields a document's blocks actually refer to
+
+**Authoring**
+- The Filament form rejects a document whose `data.source` is not registered, naming the
+  sources that are
+
+**Tests** — 32 added, including the security boundaries: an unexposed column stays
+unreachable, a scope survives a template filtering the same column, and a query cannot lift
+the row cap.
+
+### Not included
+
+`{{ ... }}` expressions are still stored verbatim and not evaluated, and nothing renders
+yet. Both arrive in M3. Relation fields can be displayed and grouped but not sorted or
+filtered on.
+
+---
+
 ## M1 — Template storage and validation · 11 Sep 2026
 
 Report documents can now be written, validated and stored.

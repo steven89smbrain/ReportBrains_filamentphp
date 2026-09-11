@@ -19,6 +19,7 @@ use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\CreateR
 use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\EditReportTemplate;
 use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\ListReportTemplates;
 use ReportBrains\ReportDesigner\Models\ReportTemplate;
+use ReportBrains\ReportDesigner\Rules\RegisteredDataSource;
 use ReportBrains\ReportDesigner\Rules\UniqueTemplateKey;
 use ReportBrains\ReportDesigner\Rules\ValidReportSchema;
 
@@ -58,6 +59,7 @@ class ReportTemplateResource extends Resource
             CodeEditor::make('schema')
                 ->language(Language::Json)
                 ->rule(new ValidReportSchema)
+                ->rule(new RegisteredDataSource)
                 ->required()
                 ->columnSpanFull()
                 // The column is cast to array; the editor works in text. Convert

@@ -3,8 +3,9 @@
 A Filament plugin for designing reports. Templates are stored as JSON documents and
 are rendered to Markdown, HTML, PDF or spreadsheets.
 
-> **Status: in development.** Template storage and validation work today. The visual
-> editor and the renderers do not exist yet — see [Roadmap](#what-works-today).
+> **Status: in development.** Templates can be stored, validated and bound to a data
+> source today. The visual editor and the renderers do not exist yet — see
+> [What works today](#what-works-today).
 > This documentation only describes behaviour that is implemented and covered by tests.
 
 ## Contents
@@ -18,6 +19,7 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | [05 — Loading templates from code](05-loading-templates.md) | The repository API |
 | [06 — Architecture](06-architecture.md) | How the pieces fit together, and why |
 | [07 — Changelog](07-changelog.md) | What shipped in each milestone |
+| [08 — Data sources](08-data-sources.md) | Exposing data to reports, safely |
 
 ## What works today
 
@@ -29,7 +31,8 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | Load templates from JSON files on disk | ✅ Working |
 | Optional per-owner and per-tenant isolation | ✅ Working |
 | Drag-and-drop visual editor | ⏳ Planned (M4) |
-| Data sources and query building | ⏳ Planned (M2) |
+| Register data sources with a field whitelist | ✅ Working |
+| Scopes, row caps and parameter validation | ✅ Working |
 | Markdown / HTML rendering | ⏳ Planned (M3) |
 | PDF rendering | ⏳ Planned (M5) |
 

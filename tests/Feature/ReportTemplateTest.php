@@ -8,8 +8,8 @@ use ReportBrains\ReportDesigner\Models\ReportTemplate;
 
 it('stores a document and reads it back as an array', function () {
     $template = ReportTemplate::create([
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'schema' => validReportDocument(),
     ]);
 
@@ -35,8 +35,8 @@ it('defaults the schema version when the document omits it', function () {
     unset($document['schema_version']);
 
     $template = ReportTemplate::create([
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'schema' => $document,
     ]);
 
@@ -53,8 +53,8 @@ it('refuses to store an invalid document', function () {
 
 it('refuses to store an invalid document on update too', function () {
     $template = ReportTemplate::create([
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'schema' => validReportDocument(),
     ]);
 
@@ -66,8 +66,8 @@ it('refuses to store an invalid document on update too', function () {
 
 it('leaves templates unscoped while ownership and tenancy are disabled', function () {
     ReportTemplate::create([
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'schema' => validReportDocument(),
     ]);
 
@@ -81,8 +81,8 @@ it('records the owner when ownership is enabled', function () {
     $this->actingAs($user);
 
     $template = ReportTemplate::create([
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'schema' => validReportDocument(),
     ]);
 
@@ -95,8 +95,8 @@ it('hides templates belonging to another owner', function () {
 
     $this->actingAs(User::factory()->create());
     ReportTemplate::create([
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'schema' => validReportDocument(),
     ]);
 

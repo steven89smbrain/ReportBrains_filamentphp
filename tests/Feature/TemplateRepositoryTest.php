@@ -22,12 +22,12 @@ afterEach(function () {
 
 it('finds a stored template by key', function () {
     ReportTemplate::create([
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'schema' => validReportDocument(),
     ]);
 
-    expect($this->repository->find('monthly-sales')->title)->toBe('Monthly Sales');
+    expect($this->repository->find('user-directory')->title)->toBe('User Directory');
 });
 
 it('throws when the key is not stored', function () {
@@ -39,10 +39,10 @@ it('returns null instead of throwing when asked for a missing key leniently', fu
 });
 
 it('reads a template from a JSON file', function () {
-    File::put($this->directory.'/monthly-sales.json', json_encode(validReportDocument()));
+    File::put($this->directory.'/user-directory.json', json_encode(validReportDocument()));
 
-    expect($this->repository->fromFileKey('monthly-sales'))
-        ->toHaveKey('title', 'Monthly Sales');
+    expect($this->repository->fromFileKey('user-directory'))
+        ->toHaveKey('title', 'User Directory');
 });
 
 it('validates a file template rather than trusting the file', function () {

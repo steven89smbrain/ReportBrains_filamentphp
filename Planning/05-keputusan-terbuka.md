@@ -7,24 +7,15 @@ Dicatat supaya alasannya tidak hilang dan tidak dibahas ulang.
 | # | Keputusan | Konsekuensi |
 |---|---|---|
 | K1 | **Produk dijual, bayar sekali per proyek** | Lisensi package `proprietary` + `LICENSE.md`. Distribusi lewat private Packagist/Anystack. Tanpa validasi kunci lisensi di runtime |
+| K2 | **Editor berlapis**: ramah pengguna bisnis sebagai tampilan utama, plus tampilan JSON untuk developer | Label kolom **wajib** saat mendaftarkan sumber data — sudah dipaksakan di `EloquentSource::addField()` |
 | K4 | **Kepemilikan & tenancy opsional, bisa dikonfigurasi** | Kolom `owner_*` dan `tenant_*` selalu ada tapi nullable; bawaan mati. Mengaktifkan nanti = backfill data, bukan migrasi |
 | K5 | **Semua bahasa Inggris** untuk UI dan `Documentation/` | `Planning/` tetap Indonesia sebagai catatan internal |
+| K7 | **Eloquent dulu, di balik interface** | `DataSource` adalah interface yang bicara dalam baris, bukan query builder. Sumber view/stored procedure/API bisa ditambah tanpa merombak |
 | — | **Dukung MySQL + PostgreSQL + SQLite** | Kolom `json` Laravel yang portabel; tidak memakai operator JSON spesifik vendor |
 
 ## Masih terbuka
 
 Diurutkan berdasar seberapa mahal kalau salah pilih di belakang hari.
-
----
-
-### K2 — Siapa yang memakai editornya? · blokir M4
-
-- **Developer** → boleh menampilkan nama field mentah, ekspresi, dan JSON. Editor lebih sederhana.
-- **Pengguna bisnis (staf keuangan/operasional)** → wajib label ramah, tanpa istilah teknis,
-  banyak validasi dan pengaman. Biaya UI naik signifikan.
-
-Untuk produk yang dijual, jawabannya juga menentukan harga dan cara memasarkan: alat developer
-dan alat pengguna akhir bukan pasar yang sama.
 
 ---
 
@@ -43,21 +34,11 @@ nomor satu. Mungkin layak mendukung dua-duanya dan membiarkan pembeli memilih.
 
 ---
 
-### K6 — Sudah dicek ada plugin serupa? · sebaiknya sebelum M2
+### K6 — Sudah dicek ada plugin serupa? · sebaiknya sebelum rilis
 
 Telusuri katalog plugin Filament dan Packagist untuk report builder. Kalau sudah ada yang mendekati,
 periksa harga dan kelengkapannya — itu menentukan posisi dan harga produk ini. Belum diperiksa;
 perlu akses pencarian web.
-
----
-
-### K7 — Sumber data selain Eloquent? · pengaruhi desain M2
-
-Perlukah mendukung query builder mentah, view database, stored procedure, atau API eksternal?
-Kalau kelak perlu, `DataSource` harus dirancang sebagai **interface** sejak awal, bukan kelas yang
-terikat Eloquent — murah sekarang, mahal nanti.
-
-Keputusan ini paling mendesak karena M2 adalah milestone berikutnya.
 
 ---
 

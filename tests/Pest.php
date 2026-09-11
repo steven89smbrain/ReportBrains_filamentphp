@@ -57,25 +57,27 @@ function validReportDocument(array $overrides = []): array
 {
     return array_replace_recursive([
         'schema_version' => 1,
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'params' => [
-            ['name' => 'from', 'type' => 'date', 'label' => 'From', 'required' => true],
+            ['name' => 'registered_from', 'type' => 'date', 'label' => 'Registered from'],
         ],
+        // Matches the "users" source registered in AppServiceProvider, so
+        // documents built here pass the registry check as well as the schema.
         'data' => [
-            'source' => 'sales',
+            'source' => 'users',
             'sort' => [['field' => 'created_at', 'dir' => 'desc']],
         ],
         'bands' => [
             'document_header' => [
-                ['type' => 'heading', 'level' => 1, 'content' => 'Monthly Sales'],
+                ['type' => 'heading', 'level' => 1, 'content' => 'User Directory'],
             ],
             'detail' => [
                 [
                     'type' => 'table',
                     'columns' => [
-                        ['field' => 'invoice_no', 'label' => 'Invoice'],
-                        ['field' => 'total', 'label' => 'Total', 'align' => 'right'],
+                        ['field' => 'name', 'label' => 'Name'],
+                        ['field' => 'email', 'label' => 'Email address'],
                     ],
                 ],
             ],

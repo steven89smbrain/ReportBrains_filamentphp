@@ -1,0 +1,36 @@
+{
+    "schema_version": 1,
+    "key": "user-directory",
+    "title": "User Directory",
+    "params": [
+        { "name": "registered_from", "type": "date", "label": "Registered from" }
+    ],
+    "data": {
+        "source": "users",
+        "sort": [{ "field": "created_at", "dir": "desc" }]
+    },
+    "page": {
+        "size": "A4",
+        "orientation": "portrait",
+        "margin": { "top": 20, "right": 15, "bottom": 20, "left": 15 }
+    },
+    "bands": {
+        "document_header": [
+            { "type": "heading", "level": 1, "content": "User Directory" },
+            { "type": "divider" }
+        ],
+        "detail": [
+            {
+                "type": "table",
+                "columns": [
+                    { "field": "name", "label": "Name" },
+                    { "field": "email", "label": "Email address" },
+                    { "field": "created_at", "label": "Registered", "align": "right" }
+                ]
+            }
+        ],
+        "document_footer": [
+            { "type": "text", "content": "Total users: {{ count(name) }}", "align": "right", "bold": true }
+        ]
+    }
+}

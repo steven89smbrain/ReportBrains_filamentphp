@@ -56,12 +56,16 @@ just to change a date range.
 | Key | Type | Required | Notes |
 |---|---|---|---|
 | `source` | string | ✅ | Name of a registered data source |
-| `filters` | array | — | Filter conditions. Format is settled in M2 |
+| `filters` | array | — | Each entry is `{field, operator, value}`. The operator must be allowed for the field's type |
 | `sort` | array | — | Each entry needs `field`; `dir` is `asc` or `desc` |
 | `group_by` | array of strings | — | Drives the `group_header` and `group_footer` bands |
 
-> `source` is recorded but not yet resolved — the data source registry arrives in M2. Until
-> then any string is accepted.
+`source` must name a registered data source — see
+[Data sources](08-data-sources.md). The Filament form rejects an unknown source when saving,
+and `ReportQueryFactory` throws `UnknownDataSource` at run time.
+
+`sort`, `group_by` and every `columns[].field` must name a field the source exposes.
+Anything else is refused rather than silently dropped.
 
 ## Page
 

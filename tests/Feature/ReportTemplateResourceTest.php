@@ -7,6 +7,7 @@ use Livewire\Livewire;
 use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\CreateReportTemplate;
 use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\ListReportTemplates;
 use ReportBrains\ReportDesigner\Models\ReportTemplate;
+use ReportBrains\ReportDesigner\Rules\RegisteredDataSource;
 
 beforeEach(function () {
     $this->actingAs(User::factory()->create());
@@ -14,8 +15,8 @@ beforeEach(function () {
 
 it('lists stored templates', function () {
     $template = ReportTemplate::create([
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'schema' => validReportDocument(),
     ]);
 
@@ -27,21 +28,21 @@ it('lists stored templates', function () {
 it('creates a template from JSON typed into the editor', function () {
     Livewire::test(CreateReportTemplate::class)
         ->fillForm([
-            'key' => 'monthly-sales',
-            'title' => 'Monthly Sales',
+            'key' => 'user-directory',
+            'title' => 'User Directory',
             'schema' => json_encode(validReportDocument()),
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
-    expect(ReportTemplate::query()->where('key', 'monthly-sales')->exists())->toBeTrue();
+    expect(ReportTemplate::query()->where('key', 'user-directory')->exists())->toBeTrue();
 });
 
 it('stores the document as an array, not a re-encoded string', function () {
     Livewire::test(CreateReportTemplate::class)
         ->fillForm([
-            'key' => 'monthly-sales',
-            'title' => 'Monthly Sales',
+            'key' => 'user-directory',
+            'title' => 'User Directory',
             'schema' => json_encode(validReportDocument()),
         ])
         ->call('create');
@@ -75,14 +76,14 @@ it('rejects malformed JSON on the form', function () {
 
 it('rejects a duplicate key', function () {
     ReportTemplate::create([
-        'key' => 'monthly-sales',
-        'title' => 'Monthly Sales',
+        'key' => 'user-directory',
+        'title' => 'User Directory',
         'schema' => validReportDocument(),
     ]);
 
     Livewire::test(CreateReportTemplate::class)
         ->fillForm([
-            'key' => 'monthly-sales',
+            'key' => 'user-directory',
             'title' => 'Another One',
             'schema' => json_encode(validReportDocument()),
         ])
@@ -94,9 +95,36 @@ it('rejects a key that is not a slug', function () {
     Livewire::test(CreateReportTemplate::class)
         ->fillForm([
             'key' => 'Monthly Sales!',
-            'title' => 'Monthly Sales',
+            'title' => 'User Directory',
             'schema' => json_encode(validReportDocument()),
         ])
         ->call('create')
         ->assertHasFormErrors(['key']);
+});
+
+it('rejects a document whose data source is not registered', function () {
+    Livewire::test(CreateReportTemplate::class)
+        ->fillForm([
+            'key' => 'payroll-report',
+            'title' => 'Payroll Report',
+            'schema' => json_encode(validReportDocument(['data' => ['source' => 'payroll']])),
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['schema']);
+
+    expect(ReportTemplate::query()->count())->toBe(0);
+});
+
+it('names the available sources when the one asked for is missing', function () {
+    $messages = [];
+
+    (new RegisteredDataSource)->validate(
+        'schema',
+        validReportDocument(['data' => ['source' => 'payroll']]),
+        function (string $message) use (&$messages): void {
+            $messages[] = $message;
+        },
+    );
+
+    expect($messages)->toBe(['The data source [payroll] is not registered. Available: users.']);
 });

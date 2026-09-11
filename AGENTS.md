@@ -23,8 +23,13 @@ project, so treat the package as a distributable product rather than app code.
   internal Indonesian working notes.
 - `Documentation/` describes only what is built and tested; `Planning/` holds what is not. Read
   `Documentation/07-changelog.md` for what exists and `Planning/04-roadmap.md` for what is next.
-- Status: M0–M1 done (storage, schema validation, panel CRUD, file loading). Next is M2 — the data
-  source registry. There is no data binding and no rendering yet.
+- **Data a report can reach is a whitelist.** Sources are registered in application code via
+  `ReportData::eloquent()`; fields are declared one at a time with a required human label. Never widen
+  that boundary for convenience — templates are user input, and `scope()` is what holds tenant and
+  permission lines.
+- Status: M0–M2 done (storage, schema validation, panel CRUD, file loading, data sources). Next is
+  M3 — the compiler and the Markdown/HTML renderers. Nothing renders yet and `{{ ... }}` expressions
+  are stored verbatim, never evaluated.
 
 ## Laravel Boost
 

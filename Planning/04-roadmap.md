@@ -5,20 +5,8 @@ milestone yang isinya hanya "menyiapkan struktur".
 
 Estimasi memakai satuan relatif (S/M/L), bukan tanggal, karena kecepatan pengerjaan belum diketahui.
 
-> **M0 dan M1 sudah selesai** — rinciannya di
+> **M0, M1 dan M2 sudah selesai** — rinciannya di
 > [`Documentation/07-changelog.md`](../Documentation/07-changelog.md).
-
----
-
-## M2 — Sumber data · M
-
-- [ ] `ReportData::source()` registry + kelas `DataSource`
-- [ ] Introspeksi metadata: daftar kolom, tipe, relasi yang diizinkan
-- [ ] Perakit query dari `data` di JSON, dengan `scope()` yang wajib diterapkan
-- [ ] Deklarasi & validasi parameter
-- [ ] Test keamanan: sumber tak terdaftar ditolak, field di luar whitelist ditolak, scope tak tertembus
-
-**Selesai bila:** satu sumber data contoh (`penjualan`) bisa mengembalikan baris terfilter dari kode.
 
 ---
 
