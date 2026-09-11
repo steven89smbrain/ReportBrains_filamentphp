@@ -69,3 +69,20 @@ atau membangun di atasnya. Belum saya periksa — perlu akses pencarian web.
 Perlukah mendukung query builder mentah, view database, stored procedure, atau API eksternal? Kalau
 kelak perlu, `DataSource` sebaiknya dirancang sebagai antarmuka (interface) sejak awal, bukan kelas
 yang terikat Eloquent — perubahan ini murah sekarang, mahal nanti.
+
+---
+
+### K8 — Siapa yang boleh mengakses panel admin? · blokir sebelum deploy
+
+Ditemukan saat M0. Filament menolak akses panel dengan 403 di environment non-`local` kecuali model
+`User` mengimplementasikan `FilamentUser`. Kontraknya sudah dipasang di `app/Models/User.php`, tapi
+`canAccessPanel()` untuk sementara mengembalikan `true` — **artinya setiap user terdaftar bisa masuk
+panel admin.**
+
+Aman untuk pengembangan, tidak aman untuk produksi. Perlu diputuskan sebelum deploy pertama:
+
+- kolom `is_admin` sederhana, atau
+- sistem peran/izin (mis. spatie/laravel-permission), atau
+- pembatasan berdasar domain email untuk pemakaian internal
+
+Keputusan ini juga memengaruhi K4 (multi-tenant) dan otorisasi per template di M1.

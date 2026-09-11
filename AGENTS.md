@@ -6,16 +6,19 @@ block in `CLAUDE.md` (this project selected Claude Code as its only Boost agent)
 
 ## Project state
 
-This is a **stock Laravel 13 skeleton** — no application code has been written yet. `app/` contains only the
-default `User` model, an abstract `Controller`, and `AppServiceProvider`; `routes/web.php` has a single route
-rendering `welcome.blade.php`.
+A Laravel 13 app that exists to host and develop **`reportbrains/filament-report-designer`** — a Filament
+plugin for designing reports. Planning documents live in `Planning/`; read
+`Planning/04-roadmap.md` for the milestone the work is currently on.
 
-Two things worth knowing before starting work:
-
-- The directory is named `Report-FilamentPhp`, but **Filament is not installed** (`composer.json` has no
-  `filament/*` requirement and there is no `app/Filament/` or admin panel provider). Adding it is still an open
-  step, not an existing convention.
-- The working tree is **not a git repository**. There is no history to consult and no commits to build on.
+- **The plugin is the product; the app is the harness.** Plugin code belongs in
+  `packages/filament-report-designer/` (namespace `ReportBrains\ReportDesigner\`), not in `app/`. It is
+  linked through a composer path repository and symlinked into `vendor/`, so edits apply with no reinstall.
+- **Filament v5** with an admin panel at `/admin`. The plugin is registered from
+  `app/Providers/Filament/AdminPanelProvider.php` via `->plugin(ReportDesignerPlugin::make())`, and it
+  discovers its own pages from the package directory.
+- `User` implements `FilamentUser`. **`canAccessPanel()` currently returns `true` for everyone** — see
+  `Planning/05-keputusan-terbuka.md` (K8) before deploying anywhere real.
+- Status as of M0: panel and plugin wiring done and covered by tests. No report functionality yet.
 
 ## Laravel Boost
 
@@ -101,10 +104,6 @@ This application is a Laravel application running on PHP 8.5. You are an expert 
 Before relying on a package's API, confirm its installed version:
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
 - JS packages: check `package.json` for the installed versions.
-
-## Skills Activation
-
-This project has domain-specific skills available in `**/skills/**`. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
 
 ## Conventions
 
@@ -192,6 +191,15 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 # Deployment
 
 - Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
+
+=== tests rules ===
+
+# Test Enforcement
+
+- Test every code change by adding or updating a test.
+- Run the affected tests and ensure they pass.
+- Test the changed behavior and its important failure modes, but do not add tests beyond them.
+- Read the `testing-best-practices` skill before writing tests.
 
 === laravel/core rules ===
 

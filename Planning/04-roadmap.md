@@ -7,15 +7,18 @@ Estimasi memakai satuan relatif (S/M/L), bukan tanggal, karena kecepatan pengerj
 
 ---
 
-## M0 — Fondasi · S
+## M0 — Fondasi · S — **SELESAI** (11 Sep 2026)
 
-- [ ] `git init` + commit awal (**kerjakan sebelum apa pun**)
-- [ ] Pasang Filament v5: `composer require filament/filament:"^5.0"` lalu `php artisan filament:install --panels`
-- [ ] Buat user admin, pastikan panel bisa diakses
-- [ ] Buat skeleton package di `packages/filament-report-designer` + path repository
-- [ ] Plugin terdaftar di panel dan muncul di menu (meski masih kosong)
+- [x] `git init` + commit awal, remote ke `ReportBrains_filamentphp`
+- [x] Filament v5.7.8 terpasang, panel admin di `/admin`
+- [x] `User` mengimplementasikan `FilamentUser` (lihat K8 — belum aman untuk produksi)
+- [x] Package `reportbrains/filament-report-designer` + path repository (symlink)
+- [x] Plugin terdaftar di panel, halaman `admin/reports` muncul dari namespace package
+- [x] 4 test membuktikan wiring: plugin terdaftar, page ditemukan, halaman render, akses tanpa login ditolak
+- [ ] Buat user admin — **perlu dijalankan sendiri** (pilih password Anda):
+      `php artisan make:filament-user`
 
-**Selesai bila:** panel Filament terbuka dan menu "Reports" tampil dari kode package, bukan dari `app/`.
+**Selesai bila:** panel Filament terbuka dan menu "Reports" tampil dari kode package, bukan dari `app/`. ✅
 
 ---
 

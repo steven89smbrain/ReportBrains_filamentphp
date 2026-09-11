@@ -1,5 +1,9 @@
 # 01 — Status Pengerjaan
 
+> **Pembaruan 11 Sep 2026:** M0 selesai. Filament v5.7.8 terpasang, skeleton package
+> `reportbrains/filament-report-designer` aktif, repo tersambung ke GitHub. Temuan #1 dan #2 di bawah
+> sudah teratasi; rincian di `04-roadmap.md`.
+
 Diperiksa: 2026-09-06. Semua angka di bawah hasil pemeriksaan langsung, bukan asumsi.
 
 ## Progres plugin: 0%
