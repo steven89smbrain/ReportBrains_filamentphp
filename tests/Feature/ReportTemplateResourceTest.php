@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\Order;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Builder;
@@ -167,12 +168,21 @@ describe('editing a template', function () {
         expect($this->template->fresh()->schema['data']['group_by'])->toBe(['email']);
     });
 
-    it('keeps stored parameters the designer does not edit', function () {
+    it('saves a filter compared with a report parameter', function () {
         Livewire::test(EditReportTemplate::class, ['record' => $this->template->getRouteKey()])
-            ->fillForm(['title' => 'Renamed'])
-            ->call('save');
+            ->fillForm(['filters' => [[
+                'field' => 'created_at',
+                'operator' => '>=',
+                'value_mode' => 'parameter',
+                'parameter' => 'registered_from',
+                'value' => null,
+            ]]])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
-        expect($this->template->fresh()->schema['params'])->toBe(validReportDocument()['params']);
+        expect($this->template->fresh()->schema['data']['filters'])->toBe([
+            ['field' => 'created_at', 'operator' => '>=', 'value' => '{{ params.registered_from }}'],
+        ]);
     });
 });
 
@@ -226,6 +236,36 @@ it('refuses to save when a stored column is no longer exposed, and says why', fu
     expect($template->fresh()->schema['data']['sort'])->toBe([['field' => 'created_at', 'dir' => 'desc']]);
 });
 
+it('previews with the parameter values typed beside the preview', function () {
+    Order::factory()->paid()->create(['invoice_no' => 'INV-RECENT', 'ordered_at' => now()->subDays(2)]);
+    Order::factory()->paid()->create(['invoice_no' => 'INV-OLDER', 'ordered_at' => now()->subDays(60)]);
+
+    $page = Livewire::test(CreateReportTemplate::class)
+        ->fillForm([
+            'key' => 'orders',
+            'title' => 'Orders',
+            'source' => 'orders',
+            'filters' => [[
+                'field' => 'ordered_at',
+                'operator' => 'between',
+                'value_mode' => 'parameter',
+                'parameter' => 'from',
+                'parameter_to' => 'to',
+            ]],
+            'band_detail' => [
+                ['type' => 'table', 'data' => ['columns' => [['field' => 'invoice_no', 'label' => 'Invoice', 'align' => null, 'format' => null]]]],
+            ],
+        ]);
+
+    // The source defaults "from" to 30 days ago, so the older order is out of range.
+    $page->assertSee('Try the report with')
+        ->assertSee('INV-RECENT')
+        ->assertDontSee('INV-OLDER');
+
+    $page->set('data.preview_parameters.from', now()->subDays(90)->toDateString())
+        ->assertSee('INV-OLDER');
+});
+
 it('previews the report against live data while designing', function () {
     Livewire::test(CreateReportTemplate::class)
         ->fillForm($this->designedState)
@@ -243,5 +283,5 @@ it('names the available sources when the one asked for is missing', function () 
         },
     );
 
-    expect($messages)->toBe(['The data source [payroll] is not registered. Available: users.']);
+    expect($messages)->toBe(['The data source [payroll] is not registered. Available: users, orders.']);
 });

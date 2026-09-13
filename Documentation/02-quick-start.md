@@ -4,6 +4,27 @@ This walks through designing a report in the panel and loading it from code. It 
 five minutes and assumes the plugin is installed, the migration has run, and at least one data
 source is registered — see [Data sources](08-data-sources.md).
 
+## 0. Want something to look at first?
+
+The development application ships sample sales data and three ready-made templates:
+
+```bash
+php artisan migrate
+php artisan db:seed --class=DemoReportSeeder
+```
+
+This creates 4 branches, 40 customers and 240 orders spread over the last 90 days, registers
+them as the **Sales orders** data source, and loads these templates into the designer:
+
+| Template | Shows off |
+|---|---|
+| **Sales by Branch** | Grouping, subtotals and a grand total; a date range from two parameters, defaulting to the last 30 days |
+| **Order List** | An optional *Status* parameter — leave it empty for every status |
+| **User Directory** | The smallest possible report |
+
+Open one and use **Try the report with** beside the preview to change the dates or status.
+The seeder is safe to run again.
+
 ## 1. Open the designer
 
 Go to **Report Templates** in the panel sidebar and press **New report template**.
@@ -20,7 +41,8 @@ Go to **Report Templates** in the panel sidebar and press **New report template*
 Open the **Data** tab and pick a **Data source**. The preview on the right starts showing
 the report as soon as there is something to show.
 
-Optionally sort, group or filter the rows here.
+Optionally sort, group or filter the rows here. A filter can compare with a fixed value or
+with a report parameter such as *From date*.
 
 ## 4. Lay out the report
 

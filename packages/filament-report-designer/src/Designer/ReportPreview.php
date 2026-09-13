@@ -7,9 +7,11 @@ namespace ReportBrains\ReportDesigner\Designer;
 use ReportBrains\ReportDesigner\Compiler\ReportCompiler;
 use ReportBrains\ReportDesigner\DataSources\ReportQueryFactory;
 use ReportBrains\ReportDesigner\Exceptions\InvalidExpression;
+use ReportBrains\ReportDesigner\Exceptions\InvalidReportParameters;
 use ReportBrains\ReportDesigner\Exceptions\InvalidReportSchema;
 use ReportBrains\ReportDesigner\Exceptions\UnknownDataSource;
 use ReportBrains\ReportDesigner\Exceptions\UnknownField;
+use ReportBrains\ReportDesigner\Exceptions\UnknownParameter;
 use ReportBrains\ReportDesigner\Exceptions\UnsupportedFeature;
 use ReportBrains\ReportDesigner\Renderers\HtmlRenderer;
 use ReportBrains\ReportDesigner\Schema\ReportSchema;
@@ -31,8 +33,9 @@ class ReportPreview
 
     /**
      * @param  array<string, mixed>  $document
+     * @param  array<string, mixed>  $parameters  Values to try the report with; blank ones use their defaults.
      */
-    public function html(array $document): string
+    public function html(array $document, array $parameters = []): string
     {
         if (blank($document['data']['source'] ?? null)) {
             return $this->message('Choose a data source to see a preview.');
@@ -42,12 +45,12 @@ class ReportPreview
             $this->schema->validate($document);
 
             $limit = (int) config('report-designer.preview.max_rows', 25);
-            $query = $this->queries->preview($document, $limit);
+            $query = $this->queries->preview($document, $limit, $parameters);
             $rows = $this->queries->sourceFor($document)->rows($query);
             $report = $this->compiler->compile($document, $rows, $query->parameters);
         } catch (InvalidReportSchema $exception) {
             return $this->message($exception->summary());
-        } catch (UnknownDataSource|UnknownField|InvalidExpression|UnsupportedFeature $exception) {
+        } catch (UnknownDataSource|UnknownField|UnknownParameter|InvalidReportParameters|InvalidExpression|UnsupportedFeature $exception) {
             return $this->message($exception->getMessage());
         }
 

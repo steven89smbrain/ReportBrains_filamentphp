@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\ServiceProvider;
 use ReportBrains\ReportDesigner\DataSources\EloquentSource;
@@ -43,6 +44,22 @@ class AppServiceProvider extends ServiceProvider
                 ->addField('created_at', 'Registered at', FieldType::DateTime)
                 ->addParameter('registered_from', 'Registered from', FieldType::Date)
                 ->maxRows(1000);
+        });
+
+        ReportData::eloquent('orders', Order::class, function (EloquentSource $source): void {
+            $source
+                ->setLabel('Sales orders')
+                ->addField('invoice_no', 'Invoice number')
+                ->addField('ordered_at', 'Order date', FieldType::DateTime)
+                ->addField('status', 'Status')
+                ->addField('total', 'Total', FieldType::Currency)
+                ->addField('customer.name', 'Customer')
+                ->addField('customer.city', 'Customer city')
+                ->addField('branch.name', 'Branch')
+                ->addParameter('from', 'From date', FieldType::Date, default: now()->subDays(30)->toDateString())
+                ->addParameter('to', 'To date', FieldType::Date, default: now()->toDateString())
+                ->addParameter('status', 'Status', FieldType::String)
+                ->maxRows(5000);
         });
     }
 }

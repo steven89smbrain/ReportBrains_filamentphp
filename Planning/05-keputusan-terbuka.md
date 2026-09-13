@@ -11,6 +11,7 @@ Dicatat supaya alasannya tidak hilang dan tidak dibahas ulang.
 | K4 | **Kepemilikan & tenancy opsional, bisa dikonfigurasi** | Kolom `owner_*` dan `tenant_*` selalu ada tapi nullable; bawaan mati. Mengaktifkan nanti = backfill data, bukan migrasi |
 | K5 | **Semua bahasa Inggris** untuk UI dan `Documentation/` | `Planning/` tetap Indonesia sebagai catatan internal |
 | K7 | **Eloquent dulu, di balik interface** | `DataSource` adalah interface yang bicara dalam baris, bukan query builder. Sumber view/stored procedure/API bisa ditambah tanpa merombak |
+| K9 | **Filter merujuk parameter** (`{{ params.x }}`), parameter tetap didefinisikan developer di sumber data | `params` di dokumen dihapus. Filter berparameter kosong dilewati; tanggal vs kolom datetime mencakup sehari penuh. Editor punya pilihan "Compare with" dan input parameter untuk preview |
 | — | **Dukung MySQL + PostgreSQL + SQLite** | Kolom `json` Laravel yang portabel; tidak memakai operator JSON spesifik vendor |
 
 ## Masih terbuka
@@ -53,26 +54,6 @@ Ini hanya soal aplikasi demo ini, bukan package-nya; pembeli akan memakai aturan
 aplikasi ini dipakai untuk demo publik.
 
 ---
-
-### K9 — Bagaimana parameter report memfilter data? · sebaiknya sebelum rilis pertama
-
-Ditemukan saat M4. Ada dua celah yang saling terkait:
-
-1. **Parameter tidak memfilter apa pun.** Parameter yang didaftarkan developer lewat
-   `addParameter()` divalidasi dan bisa ditampilkan lewat `{{ params.from }}`, tapi **tidak pernah
-   dipakai untuk menyaring baris**. Filter di dokumen hanya menerima nilai tetap. Artinya report
-   "penjualan periode X s/d Y" belum bisa dibuat.
-2. **Parameter ada di dua tempat.** Dokumen punya blok `params`, sumber data juga punya
-   `addParameter()`. Yang dipakai saat runtime hanya milik sumber data; `params` di dokumen
-   tidak berpengaruh, dan editor visual belum bisa mengubahnya.
-
-Pilihan yang masuk akal:
-
-| Opsi | Cara kerja | Konsekuensi |
-|---|---|---|
-| **Filter merujuk parameter** | Nilai filter boleh `{{ params.from }}`; parameter tetap didefinisikan developer di sumber data | Paling aman (tetap lewat whitelist); `params` di dokumen dihapus dari skema |
-| Parameter didefinisikan di dokumen | Perancang report membuat parameternya sendiri di editor | Paling fleksibel bagi pengguna bisnis; perlu aturan tipe & validasi baru |
-| Scope menerima parameter | `scope(fn ($query, $params) => ...)` | Hanya developer yang bisa memakai parameter; perancang report tidak |
 
 ## Catatan teknis M4 (bukan keputusan)
 

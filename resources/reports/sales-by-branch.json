@@ -1,0 +1,48 @@
+{
+    "schema_version": 1,
+    "key": "sales-by-branch",
+    "title": "Sales by Branch",
+    "data": {
+        "source": "orders",
+        "filters": [
+            { "field": "ordered_at", "operator": "between", "value": ["{{ params.from }}", "{{ params.to }}"] },
+            { "field": "status", "operator": "=", "value": "paid" }
+        ],
+        "sort": [{ "field": "ordered_at", "dir": "asc" }],
+        "group_by": ["branch.name"]
+    },
+    "page": {
+        "size": "A4",
+        "orientation": "landscape",
+        "margin": { "top": 15, "right": 15, "bottom": 15, "left": 15 }
+    },
+    "bands": {
+        "document_header": [
+            { "type": "heading", "level": 1, "content": "Sales by Branch" },
+            { "type": "text", "content": "Paid orders from {{ params.from | date }} to {{ params.to | date }}" },
+            { "type": "divider" }
+        ],
+        "group_header": [
+            { "type": "heading", "level": 2, "content": "{{ group.value }}" }
+        ],
+        "detail": [
+            {
+                "type": "table",
+                "columns": [
+                    { "field": "ordered_at", "label": "Date", "format": "date" },
+                    { "field": "invoice_no", "label": "Invoice" },
+                    { "field": "customer.name", "label": "Customer" },
+                    { "field": "customer.city", "label": "City" },
+                    { "field": "total", "label": "Total", "align": "right", "format": "currency" }
+                ]
+            }
+        ],
+        "group_footer": [
+            { "type": "text", "content": "{{ count(invoice_no) }} orders · Subtotal {{ sum(total) | currency }}", "align": "right", "bold": true }
+        ],
+        "document_footer": [
+            { "type": "divider" },
+            { "type": "text", "content": "Grand total: {{ sum(total) | currency }}", "align": "right", "bold": true }
+        ]
+    }
+}

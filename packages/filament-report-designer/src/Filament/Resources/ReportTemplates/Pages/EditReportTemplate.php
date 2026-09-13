@@ -39,11 +39,6 @@ class EditReportTemplate extends EditRecord
      */
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        // Parameters are not edited in the designer yet; carry the stored ones
-        // over so saving a design never silently drops them.
-        return $this->prepareTemplateAttributes(
-            $data,
-            array_intersect_key((array) $this->getRecord()->schema, ['params' => true]),
-        );
+        return $this->prepareTemplateAttributes($data);
     }
 }

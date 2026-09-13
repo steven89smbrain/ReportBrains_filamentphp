@@ -1,0 +1,41 @@
+{
+    "schema_version": 1,
+    "key": "order-list",
+    "title": "Order List",
+    "data": {
+        "source": "orders",
+        "filters": [
+            { "field": "status", "operator": "=", "value": "{{ params.status }}" },
+            { "field": "ordered_at", "operator": "between", "value": ["{{ params.from }}", "{{ params.to }}"] }
+        ],
+        "sort": [{ "field": "ordered_at", "dir": "desc" }],
+        "group_by": ["status"]
+    },
+    "bands": {
+        "document_header": [
+            { "type": "heading", "level": 1, "content": "Order List" }
+        ],
+        "group_header": [
+            { "type": "heading", "level": 2, "content": "Status: {{ group.value | upper }}" }
+        ],
+        "detail": [
+            {
+                "type": "table",
+                "columns": [
+                    { "field": "invoice_no", "label": "Invoice" },
+                    { "field": "ordered_at", "label": "Ordered", "format": "datetime" },
+                    { "field": "customer.name", "label": "Customer" },
+                    { "field": "branch.name", "label": "Branch" },
+                    { "field": "total", "label": "Total", "align": "right", "format": "currency" }
+                ]
+            }
+        ],
+        "group_footer": [
+            { "type": "text", "content": "{{ count(invoice_no) }} orders, {{ sum(total) | currency }}", "align": "right" }
+        ],
+        "document_footer": [
+            { "type": "divider" },
+            { "type": "text", "content": "All orders: {{ count(invoice_no) }} · {{ sum(total) | currency }}", "align": "right", "bold": true }
+        ]
+    }
+}

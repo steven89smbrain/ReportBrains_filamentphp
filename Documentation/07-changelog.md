@@ -4,6 +4,42 @@ Milestones as they complete. Roadmap for the unbuilt ones is in `Planning/04-roa
 
 ---
 
+## Report parameters in filters · 13 Sep 2026
+
+Parameters now narrow the data a report reads, so a template can serve any date range.
+
+**Filtering**
+- A filter value may be `{{ params.name }}`, or a `[from, to]` pair of references for
+  `between`. Only a value that is exactly one reference is substituted
+- A filter whose parameter is empty is left out rather than matching nothing; a range with one
+  bound becomes on-or-after or on-or-before
+- A plain date compared with a date-time field covers the whole day
+- Parameter values are normalised (dates to `Y-m-d`, numbers, booleans) and always bound, never
+  interpolated
+- Referencing a parameter the source does not declare throws `UnknownParameter`, when saving
+  and at run time
+
+**Designer**
+- Filters offer **Compare with → A fixed value / A report parameter**, with From/To pickers for
+  ranges
+- **Try the report with** shows an input per parameter beside the preview; values are not saved
+
+**Format change**
+- The document-level `params` array is removed. Parameters are declared once, on the data
+  source, and the designer lists them. Older documents carrying `params` still load; the key is
+  ignored
+
+**Sample data**
+- `DemoReportSeeder` creates 4 branches, 40 customers and 240 orders over 90 days, registered as
+  the **Sales orders** source, plus three templates: *Sales by Branch*, *Order List*,
+  *User Directory*. Safe to run repeatedly
+
+**Tests** — 28 added (176 total), including whole-day date boundaries, one-sided
+ranges, SQL-injection through a parameter, and a check that the sample sales report's grand total
+matches the database.
+
+---
+
 ## M4 — Visual designer · 13 Sep 2026
 
 Reports can now be designed in the panel without writing JSON.

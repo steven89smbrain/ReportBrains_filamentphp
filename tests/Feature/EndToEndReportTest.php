@@ -40,7 +40,6 @@ beforeEach(function () {
         'schema_version' => 1,
         'key' => 'orders-by-branch',
         'title' => 'Orders by Branch',
-        'params' => [['name' => 'min_total', 'type' => 'number', 'label' => 'Minimum total']],
         'data' => [
             'source' => 'orders',
             'sort' => [['field' => 'invoice_no', 'dir' => 'asc']],

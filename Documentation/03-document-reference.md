@@ -14,33 +14,12 @@ much later, at render time, where the cause is far harder to trace.
 | `schema_version` | integer | ✅ | Must be `1`. Defaulted on save if omitted |
 | `key` | string | ✅ | Lowercase slug, e.g. `monthly-sales`. Mirrored from the database column |
 | `title` | string | ✅ | Human-readable name. Mirrored from the database column |
-| `params` | array | — | Runtime inputs — see [Parameters](#parameters) |
 | `data` | object | ✅ | Where rows come from — see [Data](#data) |
 | `page` | object | — | Paper setup for paginated output — see [Page](#page) |
 | `bands` | object | ✅ | The report body — see [Bands](#bands) |
 
 `key` and `title` are written back from the database columns on every save, so the stored
 document and its columns can never drift apart.
-
-## Parameters
-
-Inputs the report asks for at run time. Without these, a template has to be duplicated
-just to change a date range.
-
-```json
-"params": [
-    { "name": "from", "type": "date", "label": "From date", "required": true },
-    { "name": "branch", "type": "select", "source": "branches", "label": "Branch" }
-]
-```
-
-| Key | Type | Required | Notes |
-|---|---|---|---|
-| `name` | string | ✅ | Lowercase, underscores allowed. Referenced as `{{ params.name }}` |
-| `type` | string | ✅ | `string`, `number`, `date`, `boolean` or `select` |
-| `label` | string | — | Shown on the parameter form |
-| `required` | boolean | — | |
-| `source` | string | — | For `select`: where the options come from |
 
 ## Data
 
@@ -56,7 +35,7 @@ just to change a date range.
 | Key | Type | Required | Notes |
 |---|---|---|---|
 | `source` | string | ✅ | Name of a registered data source |
-| `filters` | array | — | Each entry is `{field, operator, value}`. The operator must be allowed for the field's type |
+| `filters` | array | — | Each entry is `{field, operator, value}`. The operator must be allowed for the field's type. The value may be a parameter reference — see [Filter values](#filter-values) |
 | `sort` | array | — | Each entry needs `field`; `dir` is `asc` or `desc` |
 | `group_by` | array of strings | — | Drives the `group_header` and `group_footer` bands |
 
@@ -66,6 +45,33 @@ and `ReportQueryFactory` throws `UnknownDataSource` at run time.
 
 `sort`, `group_by` and every `columns[].field` must name a field the source exposes.
 Anything else is refused rather than silently dropped.
+
+### Filter values
+
+A filter value is either fixed, or taken from a report parameter at run time:
+
+```json
+"filters": [
+    { "field": "status", "operator": "=", "value": "paid" },
+    { "field": "branch", "operator": "=", "value": "{{ params.branch }}" },
+    { "field": "ordered_at", "operator": "between", "value": ["{{ params.from }}", "{{ params.to }}"] }
+]
+```
+
+Parameters are declared by the developer on the data source, not in the document — see
+[Using parameters in filters](08-data-sources.md#using-parameters-in-filters).
+
+| Operator | Value |
+|---|---|
+| `in`, `not_in` | An array. Elements may be fixed values or references |
+| `between` | A two-element array `[from, to]`. Either bound may be a reference or `null` |
+| Everything else | A single value or a single reference |
+
+Only a value that is **exactly** one reference is substituted. `"North {{ params.branch }}"`
+is compared as that literal text.
+
+> Documents from before this change could carry a top-level `params` array. It is no longer
+> part of the format and is ignored.
 
 ## Page
 

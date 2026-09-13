@@ -32,6 +32,8 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | Design reports visually in the panel, with drag-and-drop blocks | ✅ Working |
 | Live preview against real data while designing | ✅ Working |
 | JSON view and import for developers (can be switched off) | ✅ Working |
+| Filters driven by report parameters, including date ranges | ✅ Working |
+| Sample data and templates for evaluation | ✅ Working |
 | Load templates from JSON files on disk | ✅ Working |
 | Optional per-owner and per-tenant isolation | ✅ Working |
 | Register data sources with a field whitelist | ✅ Working |

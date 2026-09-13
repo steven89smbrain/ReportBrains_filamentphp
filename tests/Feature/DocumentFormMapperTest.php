@@ -13,7 +13,6 @@ beforeEach(function () {
         'schema_version' => 1,
         'key' => 'orders',
         'title' => 'Orders',
-        'params' => [['name' => 'from', 'type' => 'date']],
         'data' => [
             'source' => 'orders',
             'sort' => [['field' => 'total', 'dir' => 'desc']],
@@ -42,7 +41,7 @@ beforeEach(function () {
 it('survives a round trip through the designer unchanged', function () {
     $state = $this->mapper->toFormState($this->document);
 
-    expect($this->mapper->toDocument($state, $this->document, $this->document))->toBe($this->document);
+    expect($this->mapper->toDocument($state, $this->document))->toBe($this->document);
 });
 
 it('wraps blocks the way Filament\'s builder expects', function () {
@@ -111,8 +110,74 @@ it('skips half-filled rows the user has not finished', function () {
     expect($document['data'])->toBe(['source' => 'orders']);
 });
 
-it('does not carry parameters over unless asked to', function () {
-    $state = $this->mapper->toFormState($this->document);
+describe('filters compared with parameters', function () {
+    beforeEach(function () {
+        $this->withFilter = fn (array $filter): array => [
+            ...$this->document,
+            'data' => ['source' => 'orders', 'filters' => [$filter]],
+        ];
+    });
 
-    expect($this->mapper->toDocument($state, $this->document))->not->toHaveKey('params');
+    it('shows a filter bound to a parameter as a parameter choice', function () {
+        $state = $this->mapper->toFormState(($this->withFilter)(
+            ['field' => 'branch', 'operator' => '=', 'value' => '{{ params.branch }}'],
+        ));
+
+        expect($state['filters'][0])->toMatchArray(['value_mode' => 'parameter', 'parameter' => 'branch', 'value' => null]);
+    });
+
+    it('round-trips a date range bound to two parameters', function () {
+        $document = ($this->withFilter)(
+            ['field' => 'ordered_at', 'operator' => 'between', 'value' => ['{{ params.from }}', '{{ params.to }}']],
+        );
+        $state = $this->mapper->toFormState($document);
+
+        expect($state['filters'][0])->toMatchArray(['value_mode' => 'parameter', 'parameter' => 'from', 'parameter_to' => 'to'])
+            ->and($this->mapper->toDocument($state, $document))->toBe($document);
+    });
+
+    it('round-trips a range with only one bound chosen', function () {
+        $document = ($this->withFilter)(
+            ['field' => 'ordered_at', 'operator' => 'between', 'value' => ['{{ params.from }}', null]],
+        );
+
+        expect($this->mapper->toDocument($this->mapper->toFormState($document), $document))->toBe($document);
+    });
+
+    it('shows a range mixing a fixed bound and a parameter as text, and round-trips it', function () {
+        $document = ($this->withFilter)(
+            ['field' => 'ordered_at', 'operator' => 'between', 'value' => ['2026-01-01', '{{ params.to }}']],
+        );
+        $state = $this->mapper->toFormState($document);
+
+        expect($state['filters'][0])->toMatchArray(['value_mode' => 'fixed', 'value' => '2026-01-01, {{ params.to }}'])
+            ->and($this->mapper->toDocument($state, $document))->toBe($document);
+    });
+
+    it('writes a parameter choice back as a reference', function () {
+        $document = $this->mapper->toDocument([
+            'source' => 'orders',
+            'filters' => [['field' => 'total', 'operator' => '>=', 'value_mode' => 'parameter', 'parameter' => 'min_total']],
+        ], ['key' => 'x', 'title' => 'X']);
+
+        expect($document['data']['filters'])->toBe([['field' => 'total', 'operator' => '>=', 'value' => '{{ params.min_total }}']]);
+    });
+
+    it('ignores a parameter choice left behind on "is one of"', function () {
+        $document = $this->mapper->toDocument([
+            'source' => 'orders',
+            'filters' => [['field' => 'branch', 'operator' => 'in', 'value_mode' => 'parameter', 'parameter' => 'branch', 'value' => 'North, South']],
+        ], ['key' => 'x', 'title' => 'X']);
+
+        expect($document['data']['filters'][0]['value'])->toBe(['North', 'South']);
+    });
+
+    it('skips a parameter filter whose parameter has not been chosen yet', function () {
+        $document = $this->mapper->toDocument([
+            'source' => 'orders',
+            'filters' => [['field' => 'total', 'operator' => '>=', 'value_mode' => 'parameter', 'parameter' => null]],
+        ], ['key' => 'x', 'title' => 'X']);
+
+        expect($document['data'])->toBe(['source' => 'orders']);
+    });
 });

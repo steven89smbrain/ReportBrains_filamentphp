@@ -73,13 +73,6 @@ class ReportSchema
             'key' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/'],
             'title' => ['required', 'string', 'max:255'],
 
-            'params' => ['sometimes', 'array'],
-            'params.*.name' => ['required', 'string', 'regex:/^[a-z_][a-z0-9_]*$/'],
-            'params.*.type' => ['required', 'string', 'in:string,number,date,boolean,select'],
-            'params.*.label' => ['sometimes', 'string', 'max:255'],
-            'params.*.required' => ['sometimes', 'boolean'],
-            'params.*.source' => ['sometimes', 'string'],
-
             'data' => ['required', 'array'],
             'data.source' => ['required', 'string', 'max:255'],
             'data.filters' => ['sometimes', 'array'],

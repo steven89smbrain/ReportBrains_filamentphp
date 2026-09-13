@@ -43,9 +43,18 @@ project, so treat the package as a distributable product rather than app code.
 - **Filters do not use `filament/query-builder`** — it applies conditions straight to an Eloquent
   query and would bypass the source whitelist. Keep filters in the `{field, operator, value}`
   format that `ReportQueryFactory` validates.
-- Status: M0–M4 done (storage, validation, data sources, compiler, Markdown/HTML, visual designer
-  with live preview). Next is K9 (parameters that filter data), then M5 PDF and M6 distribution.
-  Relation fields cannot be sorted or filtered on.
+- **Filter values may be `{{ params.name }}` references, substituted only when the whole value is
+  one reference to a parameter the source declares** — see `ReportQueryFactory::resolveCondition()`.
+  An empty parameter drops its filter; a plain date against a `DateTime` field covers the whole day.
+  Parameters live on the data source only; documents have no `params` key any more.
+- **Demo data:** `database/seeders/DemoReportSeeder.php` seeds branches, customers and orders and
+  loads `resources/reports/{sales-by-branch,order-list,user-directory}.json`. The `orders` and `users`
+  sources are registered in `AppServiceProvider`. `DemoReportSeederTest` renders every sample, so a
+  change that breaks them fails the suite. Test fixture tables are prefixed `fixture_` so they never
+  collide with the demo tables.
+- Status: M0–M4 and K9 done (storage, validation, data sources, compiler, Markdown/HTML, visual
+  designer with live preview, parameter-driven filters, sample data). Next is M5 PDF (decide K3
+  first) and M6 distribution. Relation fields cannot be sorted or filtered on.
 
 ## Laravel Boost
 

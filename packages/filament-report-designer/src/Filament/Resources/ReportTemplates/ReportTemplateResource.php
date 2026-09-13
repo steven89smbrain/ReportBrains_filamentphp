@@ -8,13 +8,18 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\Builder\Block;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Html;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -28,8 +33,11 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\HtmlString;
 use Livewire\Component as Livewire;
+use ReportBrains\ReportDesigner\DataSources\Contracts\DataSource;
 use ReportBrains\ReportDesigner\DataSources\DataSourceRegistry;
 use ReportBrains\ReportDesigner\DataSources\Field;
+use ReportBrains\ReportDesigner\DataSources\FieldType;
+use ReportBrains\ReportDesigner\DataSources\Parameter;
 use ReportBrains\ReportDesigner\Designer\DocumentFormMapper;
 use ReportBrains\ReportDesigner\Designer\ReportPreview;
 use ReportBrains\ReportDesigner\Expressions\ValueFormatter;
@@ -105,10 +113,22 @@ class ReportTemplateResource extends Resource
                         Section::make('Preview')
                             ->description('Rendered against live data as you edit.')
                             ->schema([
+                                Fieldset::make('Try the report with')
+                                    ->visible(fn (Livewire $livewire): bool => static::parameterOptions($livewire) !== [])
+                                    ->schema([
+                                        Group::make()
+                                            ->statePath('preview_parameters')
+                                            ->columns(2)
+                                            ->columnSpanFull()
+                                            ->schema(fn (Livewire $livewire): array => static::previewParameterFields($livewire)),
+                                    ]),
                                 Html::make(fn (Livewire $livewire): HtmlString => new HtmlString(
                                     static::previewStyles()
                                     .'<div class="rb-preview">'
-                                    .app(ReportPreview::class)->html(static::documentFrom($livewire))
+                                    .app(ReportPreview::class)->html(
+                                        static::documentFrom($livewire),
+                                        (array) ($livewire->data['preview_parameters'] ?? []),
+                                    )
                                     .'</div>'
                                 )),
                             ]),
@@ -348,7 +368,7 @@ class ReportTemplateResource extends Resource
                 ]),
 
             Repeater::make('filters')
-                ->columns(3)
+                ->columns(2)
                 ->default([])
                 ->addActionLabel('Add filter')
                 ->live()
@@ -362,12 +382,39 @@ class ReportTemplateResource extends Resource
                         ->default('=')
                         ->required()
                         ->live(),
+                    ToggleButtons::make('value_mode')
+                        ->label('Compare with')
+                        ->options(['fixed' => 'A fixed value', 'parameter' => 'A report parameter'])
+                        ->default('fixed')
+                        ->inline()
+                        ->live()
+                        ->visible(fn (Get $get, Livewire $livewire): bool => static::parameterOptions($livewire) !== []
+                            && ! in_array($get('operator'), ['in', 'not_in'], true))
+                        ->columnSpanFull(),
                     TextInput::make('value')
                         ->helperText(fn (Get $get): ?string => in_array($get('operator'), ['in', 'not_in', 'between'], true)
                             ? 'Separate values with commas.'
                             : null)
-                        ->live(onBlur: true),
-                ]),
+                        ->visible(fn (Get $get, Livewire $livewire): bool => ! static::comparesWithParameter($get, $livewire))
+                        ->live(onBlur: true)
+                        ->columnSpanFull(),
+                    Select::make('parameter')
+                        ->label(fn (Get $get): string => $get('operator') === 'between' ? 'From' : 'Parameter')
+                        ->options(fn (Livewire $livewire): array => static::parameterOptions($livewire))
+                        ->placeholder(fn (Get $get): ?string => $get('operator') === 'between' ? 'No lower limit' : null)
+                        ->required(fn (Get $get, Livewire $livewire): bool => static::comparesWithParameter($get, $livewire)
+                            && $get('operator') !== 'between')
+                        ->visible(fn (Get $get, Livewire $livewire): bool => static::comparesWithParameter($get, $livewire))
+                        ->live(),
+                    Select::make('parameter_to')
+                        ->label('To')
+                        ->options(fn (Livewire $livewire): array => static::parameterOptions($livewire))
+                        ->placeholder('No upper limit')
+                        ->visible(fn (Get $get, Livewire $livewire): bool => static::comparesWithParameter($get, $livewire)
+                            && $get('operator') === 'between')
+                        ->live(),
+                ])
+                ->helperText('A filter compared with a parameter is skipped when the parameter is left empty.'),
         ];
     }
 
@@ -419,6 +466,64 @@ class ReportTemplateResource extends Resource
         );
 
         return array_map(fn (Field $field): string => $field->label, $fields);
+    }
+
+    private static function selectedSource(Livewire $livewire): ?DataSource
+    {
+        $key = $livewire->data['source'] ?? null;
+        $registry = app(DataSourceRegistry::class);
+
+        return is_string($key) && $registry->has($key) ? $registry->get($key) : null;
+    }
+
+    /**
+     * Parameters the selected source declares, labelled.
+     *
+     * @return array<string, string>
+     */
+    private static function parameterOptions(Livewire $livewire): array
+    {
+        $source = static::selectedSource($livewire);
+
+        return $source === null
+            ? []
+            : array_map(fn (Parameter $parameter): string => $parameter->label, $source->parameters());
+    }
+
+    private static function comparesWithParameter(Get $get, Livewire $livewire): bool
+    {
+        return $get('value_mode') === 'parameter'
+            && ! in_array($get('operator'), ['in', 'not_in'], true)
+            && static::parameterOptions($livewire) !== [];
+    }
+
+    /**
+     * One input per parameter, typed to match, for trying the report in the
+     * preview. The values are never saved with the template.
+     *
+     * @return array<int, mixed>
+     */
+    private static function previewParameterFields(Livewire $livewire): array
+    {
+        $source = static::selectedSource($livewire);
+
+        if ($source === null) {
+            return [];
+        }
+
+        return array_values(array_map(
+            fn (Parameter $parameter): mixed => (match ($parameter->type) {
+                FieldType::Date => DatePicker::make($parameter->name),
+                FieldType::DateTime => DateTimePicker::make($parameter->name),
+                FieldType::Boolean => Toggle::make($parameter->name)->inline(false),
+                FieldType::Number, FieldType::Currency => TextInput::make($parameter->name)->numeric(),
+                FieldType::String => TextInput::make($parameter->name),
+            })
+                ->label($parameter->label)
+                ->live(onBlur: true)
+                ->dehydrated(false),
+            $source->parameters(),
+        ));
     }
 
     /**

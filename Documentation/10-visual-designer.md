@@ -23,12 +23,25 @@ Start here — the other tabs offer fields from the source chosen here.
 | **Data source** | Which registered data the report reads. Only sources a developer registered are listed |
 | **Group rows by** | Splits rows into groups, each with its own header, detail and footer |
 | **Sort by** | One or more fields, each ascending or descending. Drag to change priority |
-| **Filters** | Conditions rows must meet. The operators offered depend on the field's type |
+| **Filters** | Conditions rows must meet. The operators offered depend on the field's type. Each filter compares with a fixed value or a report parameter |
 
 Field lists show the **labels** the developer gave each field, never column names.
 
 For the "is one of", "is not one of" and "between" operators, type the values separated by
 commas: `North, South`.
+
+### Filters driven by parameters
+
+When the source declares parameters, each filter offers **Compare with**:
+
+- **A fixed value** — typed into the filter and stored with the template.
+- **A report parameter** — chosen from the parameters the developer declared, such as
+  *From date*. For **between**, pick a **From** and a **To** parameter; either may be left
+  empty for an open-ended range.
+
+A filter compared with a parameter is skipped when that parameter is left empty, so a single
+template can serve "all branches" and "one branch". Dates compared with date-and-time fields
+cover the whole day.
 
 > Sorting and filtering are offered on a source's own fields only. Fields reached through a
 > relation can be shown in tables and used for grouping.
@@ -88,8 +101,10 @@ The preview re-renders as you edit, against live data from the chosen source.
 
 - It reads at most **25 rows** by default (`preview.max_rows` in the config) and says so when
   it hits the limit.
-- Report parameters use their declared defaults, so a report that requires a parameter
-  still previews.
+- When the source has parameters, **Try the report with** shows one input per parameter above
+  the preview. Change a value and the preview re-runs with it. These values are never saved
+  with the template; left empty, a parameter uses its declared default, and a report that
+  requires a parameter still previews.
 - While a design is incomplete, the preview explains what is missing instead of failing —
   for example `Choose a data source to see a preview.`
 - The preview enforces the same data boundaries as a real run: scopes apply, and fields a
@@ -117,7 +132,9 @@ $panel->plugin(
 );
 ```
 
-## What the designer does not edit yet
+## Where parameters come from
 
-Report `params` in a document are kept as they are when a design is saved, but cannot be
-edited in the designer. Import JSON to change them.
+Parameters are declared by developers on the data source — see
+[Using parameters in filters](08-data-sources.md#using-parameters-in-filters). The designer
+lists them; it does not create them. That keeps what a report can ask for inside the same
+boundary as what it can read.

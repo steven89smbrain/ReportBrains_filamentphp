@@ -59,9 +59,6 @@ function validReportDocument(array $overrides = []): array
         'schema_version' => 1,
         'key' => 'user-directory',
         'title' => 'User Directory',
-        'params' => [
-            ['name' => 'registered_from', 'type' => 'date', 'label' => 'Registered from'],
-        ],
         // Matches the "users" source registered in AppServiceProvider, so
         // documents built here pass the registry check as well as the schema.
         'data' => [

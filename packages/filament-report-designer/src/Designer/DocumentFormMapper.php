@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ReportBrains\ReportDesigner\Designer;
 
+use ReportBrains\ReportDesigner\DataSources\ParameterReference;
 use ReportBrains\ReportDesigner\Schema\BandName;
 use ReportBrains\ReportDesigner\Schema\BlockType;
 use ReportBrains\ReportDesigner\Schema\ReportSchema;
@@ -45,16 +46,7 @@ class DocumentFormMapper
                 fn (array $sort): array => ['field' => $sort['field'] ?? null, 'dir' => $sort['dir'] ?? 'asc'],
                 array_values($data['sort'] ?? []),
             ),
-            'filters' => array_map(
-                fn (array $filter): array => [
-                    'field' => $filter['field'] ?? null,
-                    'operator' => $filter['operator'] ?? '=',
-                    'value' => is_array($filter['value'] ?? null)
-                        ? implode(', ', $filter['value'])
-                        : ($filter['value'] ?? null),
-                ],
-                array_values($data['filters'] ?? []),
-            ),
+            'filters' => array_map($this->filterToState(...), array_values($data['filters'] ?? [])),
             'page_size' => $page['size'] ?? null,
             'page_orientation' => $page['orientation'] ?? null,
         ];
@@ -76,20 +68,15 @@ class DocumentFormMapper
     /**
      * @param  array<string, mixed>  $state  Designer form state.
      * @param  array<string, mixed>  $identity  `key` and `title`.
-     * @param  array<string, mixed>  $preserve  Document keys the designer does not edit, carried over as-is.
      * @return array<string, mixed>
      */
-    public function toDocument(array $state, array $identity, array $preserve = []): array
+    public function toDocument(array $state, array $identity): array
     {
         $document = [
             'schema_version' => ReportSchema::CURRENT_VERSION,
             'key' => (string) ($identity['key'] ?? ''),
             'title' => (string) ($identity['title'] ?? ''),
         ];
-
-        if (isset($preserve['params'])) {
-            $document['params'] = $preserve['params'];
-        }
 
         $document['data'] = $this->data($state);
 
@@ -136,22 +123,10 @@ class DocumentFormMapper
             $data['group_by'] = [$state['group_by']];
         }
 
-        $filters = [];
-
-        foreach (array_values($state['filters'] ?? []) as $filter) {
-            if (! filled($filter['field'] ?? null)) {
-                continue;
-            }
-
-            $operator = (string) ($filter['operator'] ?? '=');
-            $value = $filter['value'] ?? null;
-
-            if (in_array($operator, self::LIST_OPERATORS, strict: true) && is_string($value)) {
-                $value = array_values(array_filter(array_map(trim(...), explode(',', $value)), filled(...)));
-            }
-
-            $filters[] = ['field' => $filter['field'], 'operator' => $operator, 'value' => $value];
-        }
+        $filters = array_values(array_filter(array_map(
+            $this->filterToDocument(...),
+            array_values(array_filter($state['filters'] ?? [], is_array(...))),
+        )));
 
         if ($filters !== []) {
             $data['filters'] = $filters;
@@ -183,6 +158,88 @@ class DocumentFormMapper
         }
 
         return $page;
+    }
+
+    /**
+     * A filter as the designer shows it: either a fixed value, or one or two
+     * report parameters chosen from a list.
+     *
+     * A range mixing a fixed bound with a parameter has no dedicated control, so
+     * it is shown as text; it still round-trips unchanged.
+     *
+     * @param  array<string, mixed>  $filter
+     * @return array<string, mixed>
+     */
+    private function filterToState(array $filter): array
+    {
+        $operator = (string) ($filter['operator'] ?? '=');
+        $value = $filter['value'] ?? null;
+
+        $state = [
+            'field' => $filter['field'] ?? null,
+            'operator' => $operator,
+            'value_mode' => 'fixed',
+            'value' => null,
+            'parameter' => null,
+            'parameter_to' => null,
+        ];
+
+        if ($operator === 'between' && is_array($value)) {
+            $bounds = array_values($value) + [null, null];
+            $from = ParameterReference::parse($bounds[0]);
+            $to = ParameterReference::parse($bounds[1]);
+
+            if (($from !== null || $bounds[0] === null) && ($to !== null || $bounds[1] === null) && ($from ?? $to) !== null) {
+                return [...$state, 'value_mode' => 'parameter', 'parameter' => $from, 'parameter_to' => $to];
+            }
+        }
+
+        if (! is_array($value) && ! in_array($operator, ['in', 'not_in'], strict: true)
+            && ($name = ParameterReference::parse($value)) !== null) {
+            return [...$state, 'value_mode' => 'parameter', 'parameter' => $name];
+        }
+
+        return [...$state, 'value' => is_array($value) ? implode(', ', $value) : $value];
+    }
+
+    /**
+     * @param  array<string, mixed>  $filter
+     * @return array{field: string, operator: string, value: mixed}|null
+     */
+    private function filterToDocument(array $filter): ?array
+    {
+        if (! filled($filter['field'] ?? null)) {
+            return null;
+        }
+
+        $operator = (string) ($filter['operator'] ?? '=');
+        $usesParameter = ($filter['value_mode'] ?? 'fixed') === 'parameter'
+            && ! in_array($operator, ['in', 'not_in'], strict: true);
+
+        if ($usesParameter && $operator === 'between') {
+            $bounds = [$this->reference($filter['parameter'] ?? null), $this->reference($filter['parameter_to'] ?? null)];
+
+            return $bounds === [null, null] ? null : ['field' => $filter['field'], 'operator' => $operator, 'value' => $bounds];
+        }
+
+        if ($usesParameter) {
+            $reference = $this->reference($filter['parameter'] ?? null);
+
+            return $reference === null ? null : ['field' => $filter['field'], 'operator' => $operator, 'value' => $reference];
+        }
+
+        $value = $filter['value'] ?? null;
+
+        if (in_array($operator, self::LIST_OPERATORS, strict: true) && is_string($value)) {
+            $value = array_values(array_filter(array_map(trim(...), explode(',', $value)), filled(...)));
+        }
+
+        return ['field' => $filter['field'], 'operator' => $operator, 'value' => $value];
+    }
+
+    private function reference(mixed $parameter): ?string
+    {
+        return is_string($parameter) && $parameter !== '' ? ParameterReference::to($parameter) : null;
     }
 
     /**

@@ -54,9 +54,10 @@ Dikerjakan berdasarkan umpan balik pemakaian nyata, bukan tebakan:
 Sejak M4, **produk sudah layak didemokan**: report bisa dirancang lewat UI, dipreview dengan data
 sungguhan, dan dirender jadi Markdown/HTML.
 
-Yang masih memisahkan dari **rilis berbayar pertama** bukan fitur editor lagi, melainkan:
+Yang masih memisahkan dari **rilis berbayar pertama**:
 
 1. **Jalur distribusi** (bagian dari M6) — tanpa itu produk tidak bisa dijual.
-2. **K9 — parameter belum memfilter data** (lihat `05-keputusan-terbuka.md`). Report tanpa filter
-   rentang tanggal akan terasa setengah jadi bagi pembeli.
-3. **M5 (PDF)** — hampir pasti diminta pembeli, tapi bisa menyusul setelah rilis pertama.
+2. **M5 (PDF)** — hampir pasti diminta pembeli, tapi bisa menyusul setelah rilis pertama.
+
+K9 (parameter yang memfilter data) sudah selesai, dan aplikasi demo kini punya data contoh
+penjualan (`php artisan db:seed --class=DemoReportSeeder`) untuk demo ke calon pembeli.

@@ -15,6 +15,7 @@ use ReportBrains\ReportDesigner\Designer\DocumentFormMapper;
 use ReportBrains\ReportDesigner\Exceptions\InvalidReportSchema;
 use ReportBrains\ReportDesigner\Exceptions\UnknownDataSource;
 use ReportBrains\ReportDesigner\Exceptions\UnknownField;
+use ReportBrains\ReportDesigner\Exceptions\UnknownParameter;
 use ReportBrains\ReportDesigner\ReportDesignerPlugin;
 use ReportBrains\ReportDesigner\Schema\ReportSchema;
 
@@ -30,24 +31,23 @@ trait DesignsReports
      * when it is not valid.
      *
      * @param  array<string, mixed>  $data
-     * @param  array<string, mixed>  $preserve  Document keys the designer does not edit.
      * @return array<string, mixed> Attributes for the model.
      */
-    protected function prepareTemplateAttributes(array $data, array $preserve = []): array
+    protected function prepareTemplateAttributes(array $data): array
     {
         $identity = [
             'key' => $data['key'] ?? $this->record?->key ?? null,
             'title' => $data['title'] ?? null,
         ];
 
-        $document = app(DocumentFormMapper::class)->toDocument($data, $identity, $preserve);
+        $document = app(DocumentFormMapper::class)->toDocument($data, $identity);
 
         try {
             app(ReportSchema::class)->validate($document);
             app(ReportQueryFactory::class)->validateBindings($document);
         } catch (InvalidReportSchema $exception) {
             $this->refuseToSave($exception->summary());
-        } catch (UnknownDataSource|UnknownField $exception) {
+        } catch (UnknownDataSource|UnknownField|UnknownParameter $exception) {
             $this->refuseToSave($exception->getMessage());
         }
 

@@ -136,6 +136,7 @@ designer makes.
 | Code execution via expressions | `{{ ... }}` goes through a sandboxed evaluator that accepts only field and parameter references and allow-listed aggregates and formatters — never Blade or `eval` |
 | Unexposed data via the designer or preview | Field pickers offer only whitelisted fields; saving and the preview both enforce the whitelist and scopes |
 | Script injection in rendered output | Markdown and HTML renderers escape every value |
+| Parameter values reaching SQL | Substituted only where a filter value is exactly one `{{ params.x }}` reference to a declared parameter, and always passed as a binding |
 
 ## Database portability
 

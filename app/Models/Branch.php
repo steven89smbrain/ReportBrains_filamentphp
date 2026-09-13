@@ -1,20 +1,22 @@
 <?php
 
-declare(strict_types=1);
+namespace App\Models;
 
-namespace Tests\Fixtures;
-
+use Database\Factories\BranchFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['name', 'city'])]
-class Customer extends Model
+class Branch extends Model
 {
-    protected $table = 'fixture_customers';
+    /** @use HasFactory<BranchFactory> */
+    use HasFactory;
 
-    public $timestamps = false;
-
+    /**
+     * @return HasMany<Order, $this>
+     */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
