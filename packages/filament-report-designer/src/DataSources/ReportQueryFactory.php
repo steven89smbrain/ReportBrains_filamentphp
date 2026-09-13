@@ -35,21 +35,74 @@ class ReportQueryFactory
      */
     public function make(array $document, array $parameters = []): ReportQuery
     {
-        $source = $this->registry->get($document['data']['source']);
-        $data = $document['data'];
+        $source = $this->validateBindings($document);
+
+        return $this->build($document, $source, $this->resolveParameters($source, $parameters));
+    }
+
+    /**
+     * Check that everything a document names exists on its source, without
+     * needing parameter values.
+     *
+     * Used when a template is saved, where no one has supplied parameters yet
+     * but a column that the source does not expose is already a mistake.
+     *
+     * @param  array<string, mixed>  $document
+     *
+     * @throws UnknownDataSource
+     * @throws UnknownField
+     */
+    public function validateBindings(array $document): DataSource
+    {
+        $source = $this->registry->get((string) ($document['data']['source'] ?? ''));
+
+        $this->build($document, $source, []);
+
+        return $source;
+    }
+
+    /**
+     * A query for the designer preview: bindings are still enforced, but
+     * parameters fall back to their declared defaults instead of being
+     * required, and the row count is capped.
+     *
+     * @param  array<string, mixed>  $document
+     *
+     * @throws UnknownDataSource
+     * @throws UnknownField
+     */
+    public function preview(array $document, int $limit): ReportQuery
+    {
+        $source = $this->validateBindings($document);
+
+        $parameters = array_map(fn (Parameter $parameter): mixed => $parameter->default, $source->parameters());
+
+        return $this->build($document, $source, $parameters)->withLimit($limit);
+    }
+
+    /**
+     * @param  array<string, mixed>  $document
+     */
+    public function sourceFor(array $document): DataSource
+    {
+        return $this->registry->get((string) ($document['data']['source'] ?? ''));
+    }
+
+    /**
+     * @param  array<string, mixed>  $document
+     * @param  array<string, mixed>  $parameters
+     */
+    private function build(array $document, DataSource $source, array $parameters): ReportQuery
+    {
+        $data = $document['data'] ?? [];
 
         return new ReportQuery(
             fields: $this->resolveFields($document, $source),
             filters: $this->resolveFilters($data['filters'] ?? [], $source),
             sort: $this->resolveSort($data['sort'] ?? [], $source),
             groupBy: $this->resolveGroupBy($data['group_by'] ?? [], $source),
-            parameters: $this->resolveParameters($source, $parameters),
+            parameters: $parameters,
         );
-    }
-
-    public function sourceFor(array $document): DataSource
-    {
-        return $this->registry->get($document['data']['source']);
     }
 
     /**

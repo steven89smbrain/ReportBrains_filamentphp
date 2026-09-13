@@ -5,21 +5,8 @@ milestone yang isinya hanya "menyiapkan struktur".
 
 Estimasi memakai satuan relatif (S/M/L), bukan tanggal, karena kecepatan pengerjaan belum diketahui.
 
-> **M0–M3 sudah selesai** — rinciannya di
+> **M0–M4 sudah selesai** — rinciannya di
 > [`Documentation/07-changelog.md`](../Documentation/07-changelog.md).
-
----
-
-## M4 — Editor v1 (Builder Filament) · M
-
-- [ ] Halaman editor memakai komponen Builder dari `filament/schemas` — drag-drop reorder sudah bawaan
-- [ ] Blok: heading, teks, tabel, pemisah, spasi
-- [ ] Panel field: menampilkan kolom dari sumber data terpilih, klik untuk menyisipkan binding
-- [ ] Filter memakai `filament/query-builder`
-- [ ] Preview langsung berdampingan dengan editor
-
-**Selesai bila:** report sederhana bisa dirancang penuh lewat UI tanpa menyentuh JSON manual.
-**Di sini produk sudah layak didemokan.**
 
 ---
 
@@ -64,10 +51,12 @@ Dikerjakan berdasarkan umpan balik pemakaian nyata, bukan tebakan:
 
 ## Posisi sekarang
 
-Renderer sengaja didahulukan sebelum editor, dan itu terbukti tepat: setelah M3, produk sudah
-**berguna tanpa editor visual sama sekali** — template ditulis sebagai JSON dan report sudah
-keluar sebagai Markdown/HTML.
+Sejak M4, **produk sudah layak didemokan**: report bisa dirancang lewat UI, dipreview dengan data
+sungguhan, dan dirender jadi Markdown/HTML.
 
-Untuk produk yang dijual, **titik layak rilis paling awal adalah akhir M4**: pengguna bisa
-merancang report lewat UI dan mendapat keluaran. M5 (PDF) hampir pasti diminta pembeli, tapi
-tidak memblokir rilis pertama.
+Yang masih memisahkan dari **rilis berbayar pertama** bukan fitur editor lagi, melainkan:
+
+1. **Jalur distribusi** (bagian dari M6) — tanpa itu produk tidak bisa dijual.
+2. **K9 — parameter belum memfilter data** (lihat `05-keputusan-terbuka.md`). Report tanpa filter
+   rentang tanggal akan terasa setengah jadi bagi pembeli.
+3. **M5 (PDF)** — hampir pasti diminta pembeli, tapi bisa menyusul setelah rilis pertama.

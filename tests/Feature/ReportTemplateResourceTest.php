@@ -3,14 +3,47 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\Builder;
+use Filament\Forms\Components\Repeater;
 use Livewire\Livewire;
+use ReportBrains\ReportDesigner\Facades\ReportData;
 use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\CreateReportTemplate;
+use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\EditReportTemplate;
 use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\ListReportTemplates;
 use ReportBrains\ReportDesigner\Models\ReportTemplate;
 use ReportBrains\ReportDesigner\Rules\RegisteredDataSource;
 
 beforeEach(function () {
-    $this->actingAs(User::factory()->create());
+    $this->user = User::factory()->create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com']);
+    $this->actingAs($this->user);
+
+    // Builder and repeater items are keyed by UUID in the browser; numeric keys
+    // make the state predictable in tests.
+    $this->undoFakes = [Repeater::fake(), Builder::fake()];
+
+    // A document designed entirely through the form, against the "users" source
+    // registered in AppServiceProvider.
+    $this->designedState = [
+        'key' => 'user-directory',
+        'title' => 'User Directory',
+        'source' => 'users',
+        'band_document_header' => [
+            ['type' => 'heading', 'data' => ['content' => 'User Directory', 'level' => 1, 'align' => null]],
+        ],
+        'band_detail' => [
+            ['type' => 'table', 'data' => ['columns' => [
+                ['field' => 'name', 'label' => 'Name', 'align' => null, 'format' => null],
+                ['field' => 'email', 'label' => 'Email address', 'align' => null, 'format' => null],
+            ]]],
+        ],
+    ];
+});
+
+afterEach(function () {
+    foreach ($this->undoFakes as $undo) {
+        $undo();
+    }
 });
 
 it('lists stored templates', function () {
@@ -25,94 +58,178 @@ it('lists stored templates', function () {
         ->assertCanSeeTableRecords([$template]);
 });
 
-it('creates a template from JSON typed into the editor', function () {
-    Livewire::test(CreateReportTemplate::class)
-        ->fillForm([
+describe('designing a template', function () {
+    it('stores a report designed without touching JSON', function () {
+        Livewire::test(CreateReportTemplate::class)
+            ->fillForm($this->designedState)
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        expect(ReportTemplate::query()->firstOrFail()->schema)->toBe([
+            'schema_version' => 1,
             'key' => 'user-directory',
             'title' => 'User Directory',
-            'schema' => json_encode(validReportDocument()),
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
+            'data' => ['source' => 'users'],
+            'bands' => [
+                'document_header' => [['type' => 'heading', 'level' => 1, 'content' => 'User Directory']],
+                'detail' => [['type' => 'table', 'columns' => [
+                    ['field' => 'name', 'label' => 'Name'],
+                    ['field' => 'email', 'label' => 'Email address'],
+                ]]],
+            ],
+        ]);
+    });
 
-    expect(ReportTemplate::query()->where('key', 'user-directory')->exists())->toBeTrue();
-});
+    it('refuses to save a column the source does not expose, and says why', function () {
+        $state = $this->designedState;
+        $state['band_detail'][0]['data']['columns'][] = ['field' => 'password', 'label' => 'Password'];
 
-it('stores the document as an array, not a re-encoded string', function () {
-    Livewire::test(CreateReportTemplate::class)
-        ->fillForm([
+        // The column picker only offers exposed fields, so the value is refused
+        // on the field itself before the save-time binding check is reached.
+        Livewire::test(CreateReportTemplate::class)
+            ->fillForm($state)
+            ->call('create')
+            ->assertHasFormErrors(['band_detail.0.data.columns.2.field']);
+
+        expect(ReportTemplate::query()->count())->toBe(0);
+    });
+
+    it('refuses to save an invalid document, and says why', function () {
+        $state = $this->designedState;
+        $state['band_detail'] = [['type' => 'text', 'data' => ['content' => '']]];
+
+        Livewire::test(CreateReportTemplate::class)
+            ->fillForm($state)
+            ->call('create')
+            ->assertHasFormErrors(['band_detail.0.data.content']);
+
+        expect(ReportTemplate::query()->count())->toBe(0);
+    });
+
+    it('rejects a data source that is not registered', function () {
+        Livewire::test(CreateReportTemplate::class)
+            ->fillForm([...$this->designedState, 'source' => 'payroll'])
+            ->call('create')
+            ->assertHasFormErrors(['source']);
+
+        expect(ReportTemplate::query()->count())->toBe(0);
+    });
+
+    it('rejects a duplicate key', function () {
+        ReportTemplate::create([
             'key' => 'user-directory',
             'title' => 'User Directory',
-            'schema' => json_encode(validReportDocument()),
-        ])
-        ->call('create');
+            'schema' => validReportDocument(),
+        ]);
 
-    expect(ReportTemplate::query()->firstOrFail()->schema)->toBeArray();
+        Livewire::test(CreateReportTemplate::class)
+            ->fillForm([...$this->designedState, 'title' => 'Another One'])
+            ->call('create')
+            ->assertHasFormErrors(['key']);
+    });
+
+    it('rejects a key that is not a slug', function () {
+        Livewire::test(CreateReportTemplate::class)
+            ->fillForm([...$this->designedState, 'key' => 'User Directory!'])
+            ->call('create')
+            ->assertHasFormErrors(['key']);
+    });
 });
 
-it('surfaces schema errors on the form instead of saving', function () {
-    Livewire::test(CreateReportTemplate::class)
-        ->fillForm([
-            'key' => 'broken',
-            'title' => 'Broken',
-            'schema' => json_encode(validReportDocument(['bands' => ['nonsense' => []]])),
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['schema']);
+describe('editing a template', function () {
+    beforeEach(function () {
+        $this->template = ReportTemplate::create([
+            'key' => 'user-directory',
+            'title' => 'User Directory',
+            'schema' => validReportDocument(),
+        ]);
+    });
 
-    expect(ReportTemplate::query()->count())->toBe(0);
+    it('opens the stored document in the designer', function () {
+        Livewire::test(EditReportTemplate::class, ['record' => $this->template->getRouteKey()])
+            ->assertSchemaStateSet([
+                'source' => 'users',
+                'band_detail' => [
+                    ['type' => 'table', 'data' => ['columns' => [
+                        ['field' => 'name', 'label' => 'Name', 'align' => null, 'format' => null],
+                        ['field' => 'email', 'label' => 'Email address', 'align' => null, 'format' => null],
+                    ]]],
+                ],
+            ]);
+    });
+
+    it('saves a change made in the designer', function () {
+        Livewire::test(EditReportTemplate::class, ['record' => $this->template->getRouteKey()])
+            ->fillForm(['group_by' => 'email'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($this->template->fresh()->schema['data']['group_by'])->toBe(['email']);
+    });
+
+    it('keeps stored parameters the designer does not edit', function () {
+        Livewire::test(EditReportTemplate::class, ['record' => $this->template->getRouteKey()])
+            ->fillForm(['title' => 'Renamed'])
+            ->call('save');
+
+        expect($this->template->fresh()->schema['params'])->toBe(validReportDocument()['params']);
+    });
 });
 
-it('rejects malformed JSON on the form', function () {
-    Livewire::test(CreateReportTemplate::class)
-        ->fillForm([
-            'key' => 'broken',
-            'title' => 'Broken',
-            'schema' => '{"title": ',
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['schema']);
+describe('importing JSON', function () {
+    it('replaces the design with an imported document', function () {
+        Livewire::test(CreateReportTemplate::class)
+            ->callAction('importJson', data: ['json' => json_encode(validReportDocument())])
+            ->assertSchemaStateSet([
+                'title' => 'User Directory',
+                'source' => 'users',
+            ]);
+    });
+
+    it('reports malformed JSON instead of replacing the design', function () {
+        Livewire::test(CreateReportTemplate::class)
+            ->fillForm(['source' => 'users'])
+            ->callAction('importJson', data: ['json' => '{"title": '])
+            ->assertNotified('Import failed')
+            ->assertSchemaStateSet(['source' => 'users']);
+    });
+
+    it('is hidden when the panel switches the JSON editor off', function () {
+        Filament::getPanel('admin')->getPlugin('report-designer')->jsonEditor(false);
+
+        Livewire::test(CreateReportTemplate::class)->assertActionHidden('importJson');
+    });
 });
 
-it('rejects a duplicate key', function () {
-    ReportTemplate::create([
+it('refuses to save when a stored column is no longer exposed, and says why', function () {
+    // A developer removed a field after the template was saved. Nothing in the
+    // form offers it any more, so the save-time binding check is the backstop.
+    $template = ReportTemplate::create([
         'key' => 'user-directory',
         'title' => 'User Directory',
         'schema' => validReportDocument(),
     ]);
 
-    Livewire::test(CreateReportTemplate::class)
-        ->fillForm([
-            'key' => 'user-directory',
-            'title' => 'Another One',
-            'schema' => json_encode(validReportDocument()),
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['key']);
+    ReportData::eloquent('users', User::class, function ($source): void {
+        $source->setLabel('Users')->addField('name', 'Name');
+    });
+
+    $page = Livewire::test(EditReportTemplate::class, ['record' => $template->getRouteKey()]);
+
+    $page->set('data.band_detail.0.data.columns', [['field' => 'name', 'label' => 'Name']])
+        ->set('data.group_by', null);
+
+    // Put the retired field back in state directly, as stale browser state would.
+    $page->set('data.sort', [['field' => 'email', 'dir' => 'asc']])
+        ->call('save');
+
+    expect($template->fresh()->schema['data']['sort'])->toBe([['field' => 'created_at', 'dir' => 'desc']]);
 });
 
-it('rejects a key that is not a slug', function () {
+it('previews the report against live data while designing', function () {
     Livewire::test(CreateReportTemplate::class)
-        ->fillForm([
-            'key' => 'Monthly Sales!',
-            'title' => 'User Directory',
-            'schema' => json_encode(validReportDocument()),
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['key']);
-});
-
-it('rejects a document whose data source is not registered', function () {
-    Livewire::test(CreateReportTemplate::class)
-        ->fillForm([
-            'key' => 'payroll-report',
-            'title' => 'Payroll Report',
-            'schema' => json_encode(validReportDocument(['data' => ['source' => 'payroll']])),
-        ])
-        ->call('create')
-        ->assertHasFormErrors(['schema']);
-
-    expect(ReportTemplate::query()->count())->toBe(0);
+        ->fillForm($this->designedState)
+        ->assertSee('ada@example.com');
 });
 
 it('names the available sources when the one asked for is missing', function () {

@@ -33,19 +33,24 @@ developing and demonstrating it.
 
 ```
 packages/filament-report-designer/
-├── config/report-designer.php      Ownership, tenancy, table name, file paths
+├── config/report-designer.php      Ownership, tenancy, preview, formatting, file paths
 ├── database/migrations/            The report_templates table
-├── src/
-│   ├── ReportDesignerPlugin.php    Filament entry point
-│   ├── ReportDesignerServiceProvider.php
-│   ├── TemplateRepository.php      Loads documents from the database or disk
-│   ├── Models/ReportTemplate.php   Stored document
-│   ├── Schema/                     Document format: validator and enums
-│   ├── Rules/                      Validation rules reused by the form and the model
-│   ├── Support/Scope.php           Resolves owner and tenant
-│   ├── Exceptions/
-│   └── Filament/                   Resources and pages
-└── resources/views/
+└── src/
+    ├── ReportDesignerPlugin.php    Filament entry point, plugin options
+    ├── ReportDesignerServiceProvider.php
+    ├── TemplateRepository.php      Loads documents from the database or disk
+    ├── Models/ReportTemplate.php   Stored document
+    ├── Schema/                     Document format: validator, bands, block types
+    ├── DataSources/                Registry, whitelist, query factory
+    ├── Expressions/                Sandboxed {{ }} evaluator and formatters
+    ├── Compiler/                   Document + rows → RenderedReport
+    ├── Renderers/                  Markdown and HTML
+    ├── Designer/                   Form state ⇄ document mapping, live preview
+    ├── Filament/                   The template resource and its pages
+    ├── Facades/ReportData.php
+    ├── Rules/                      Validation rules
+    ├── Support/Scope.php           Resolves owner and tenant
+    └── Exceptions/
 ```
 
 ## Where validation happens

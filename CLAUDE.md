@@ -33,8 +33,18 @@ project, so treat the package as a distributable product rather than app code.
 - **Renderers only translate.** `ReportCompiler` resolves everything first; a `RenderedReport` holds
   no expressions, field references or database access. Keep new renderers free of both, and escape
   all data — report rows come from the host's database.
-- Status: M0–M3 done (storage, validation, panel CRUD, data sources, compiler, Markdown/HTML). Next
-  is M4 — the visual editor. No PDF yet; relation fields cannot be sorted or filtered on.
+- **The designer's form shape never reaches storage.** `DocumentFormMapper` owns the translation
+  between Filament's builder state (`{type, data}` items keyed by UUID, flat `band_*` keys, comma
+  text for list filters) and the stored document, and a document must round-trip through it
+  unchanged. Add new block settings to the mapper and its round-trip test together.
+- **Designer tests need `Repeater::fake()` and `Builder::fake()`** (undo them after), or item keys
+  are random UUIDs and state assertions cannot match.
+- **Filters do not use `filament/query-builder`** — it applies conditions straight to an Eloquent
+  query and would bypass the source whitelist. Keep filters in the `{field, operator, value}`
+  format that `ReportQueryFactory` validates.
+- Status: M0–M4 done (storage, validation, data sources, compiler, Markdown/HTML, visual designer
+  with live preview). Next is K9 (parameters that filter data), then M5 PDF and M6 distribution.
+  Relation fields cannot be sorted or filtered on.
 
 ## Laravel Boost
 

@@ -3,8 +3,8 @@
 A Filament plugin for designing reports. Templates are stored as JSON documents and
 are rendered to Markdown, HTML, PDF or spreadsheets.
 
-> **Status: in development.** Reports can be written, bound to data and rendered to
-> Markdown or HTML today. The visual editor and PDF output do not exist yet — see
+> **Status: in development.** Reports can be designed visually in the panel, bound to data
+> and rendered to Markdown or HTML today. PDF output does not exist yet — see
 > [What works today](#what-works-today).
 > This documentation only describes behaviour that is implemented and covered by tests.
 
@@ -21,6 +21,7 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | [07 — Changelog](07-changelog.md) | What shipped in each milestone |
 | [08 — Data sources](08-data-sources.md) | Exposing data to reports, safely |
 | [09 — Expressions and rendering](09-expressions-and-rendering.md) | The `{{ }}` language, formatting, and the Markdown/HTML renderers |
+| [10 — The visual designer](10-visual-designer.md) | Designing reports in the panel, with live preview |
 
 ## What works today
 
@@ -28,10 +29,11 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 |---|---|
 | Store report documents in the database | ✅ Working |
 | Validate documents against a versioned schema | ✅ Working |
-| Manage templates in the Filament panel (JSON editor) | ✅ Working |
+| Design reports visually in the panel, with drag-and-drop blocks | ✅ Working |
+| Live preview against real data while designing | ✅ Working |
+| JSON view and import for developers (can be switched off) | ✅ Working |
 | Load templates from JSON files on disk | ✅ Working |
 | Optional per-owner and per-tenant isolation | ✅ Working |
-| Drag-and-drop visual editor | ⏳ Planned (M4) |
 | Register data sources with a field whitelist | ✅ Working |
 | Scopes, row caps and parameter validation | ✅ Working |
 | Markdown and HTML rendering | ✅ Working |

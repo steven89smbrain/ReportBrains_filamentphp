@@ -131,3 +131,20 @@ it('includes sort and group fields in the fields that must be read', function ()
 
     expect($query->requiredFields())->toEqualCanonicalizing(['invoice_no', 'total', 'branch']);
 });
+
+describe('without parameter values', function () {
+    it('validates bindings without asking for required parameters', function () {
+        expect($this->factory->validateBindings(($this->document)())->key())->toBe('orders');
+    });
+
+    it('still rejects an unexposed column when only validating bindings', function () {
+        $this->factory->validateBindings(($this->document)([], [['field' => 'secret_note', 'label' => 'x']]));
+    })->throws(UnknownField::class);
+
+    it('builds a preview query from declared defaults, capped to the limit', function () {
+        $query = $this->factory->preview(($this->document)(), 5);
+
+        expect($query->limit)->toBe(5)
+            ->and($query->parameters)->toBe(['min_total' => null, 'branch' => null]);
+    });
+});

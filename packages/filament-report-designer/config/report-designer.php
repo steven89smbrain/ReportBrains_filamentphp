@@ -50,6 +50,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Designer preview
+    |--------------------------------------------------------------------------
+    |
+    | The live preview beside the designer runs the report against real data.
+    | It is capped so that editing a template never pulls a whole table.
+    |
+    */
+
+    'preview' => [
+        'max_rows' => 25,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Formatting
     |--------------------------------------------------------------------------
     |

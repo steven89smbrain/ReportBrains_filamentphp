@@ -51,3 +51,33 @@ mengimplementasikan `FilamentUser`. Kontraknya sudah dipasang di `app/Models/Use
 Ini hanya soal aplikasi demo ini, bukan package-nya; pembeli akan memakai aturan mereka sendiri
 (sudah didokumentasikan di `Documentation/01-installation.md`). Tetap perlu dibereskan sebelum
 aplikasi ini dipakai untuk demo publik.
+
+---
+
+### K9 — Bagaimana parameter report memfilter data? · sebaiknya sebelum rilis pertama
+
+Ditemukan saat M4. Ada dua celah yang saling terkait:
+
+1. **Parameter tidak memfilter apa pun.** Parameter yang didaftarkan developer lewat
+   `addParameter()` divalidasi dan bisa ditampilkan lewat `{{ params.from }}`, tapi **tidak pernah
+   dipakai untuk menyaring baris**. Filter di dokumen hanya menerima nilai tetap. Artinya report
+   "penjualan periode X s/d Y" belum bisa dibuat.
+2. **Parameter ada di dua tempat.** Dokumen punya blok `params`, sumber data juga punya
+   `addParameter()`. Yang dipakai saat runtime hanya milik sumber data; `params` di dokumen
+   tidak berpengaruh, dan editor visual belum bisa mengubahnya.
+
+Pilihan yang masuk akal:
+
+| Opsi | Cara kerja | Konsekuensi |
+|---|---|---|
+| **Filter merujuk parameter** | Nilai filter boleh `{{ params.from }}`; parameter tetap didefinisikan developer di sumber data | Paling aman (tetap lewat whitelist); `params` di dokumen dihapus dari skema |
+| Parameter didefinisikan di dokumen | Perancang report membuat parameternya sendiri di editor | Paling fleksibel bagi pengguna bisnis; perlu aturan tipe & validasi baru |
+| Scope menerima parameter | `scope(fn ($query, $params) => ...)` | Hanya developer yang bisa memakai parameter; perancang report tidak |
+
+## Catatan teknis M4 (bukan keputusan)
+
+**Filter tidak memakai `filament/query-builder`,** berbeda dari rencana awal. Operator query-builder
+menerapkan kondisi langsung ke query Eloquent memakai nama kolom, sehingga akan melewati whitelist
+sumber data dan mengikat filter ke Eloquent — bertentangan dengan keputusan K7 (sumber data bicara
+dalam baris). Filter dibangun dengan Repeater yang hanya menawarkan field terdaftar dan operator
+sesuai tipenya, lalu tetap divalidasi `ReportQueryFactory`.

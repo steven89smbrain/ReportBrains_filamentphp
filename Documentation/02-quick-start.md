@@ -1,101 +1,76 @@
 # 02 — Quick start
 
-This walks through creating a template, then loading it from code. It takes about five
-minutes and assumes the plugin is installed and the migration has run.
-
-> The visual editor is not built yet (planned for M4). Templates are currently written
-> as JSON. Everything you write now stays valid once the editor arrives — the editor will
-> produce exactly this format.
+This walks through designing a report in the panel and loading it from code. It takes about
+five minutes and assumes the plugin is installed, the migration has run, and at least one data
+source is registered — see [Data sources](08-data-sources.md).
 
 ## 1. Open the designer
 
-Go to **Report Templates** in the panel sidebar, or visit `/admin/report-templates`
-directly, and press **New report template**.
+Go to **Report Templates** in the panel sidebar and press **New report template**.
 
-## 2. Fill in the identity fields
+## 2. Name the report
 
-| Field | Example | Notes |
-|---|---|---|
-| Title | `Monthly Sales` | Shown in listings |
-| Key | `monthly-sales` | Lowercase, hyphen-separated. This is how code calls the report, and it cannot be changed after creation |
-| Description | *(optional)* | Free text |
-
-## 3. Write the document
-
-Paste this into the schema editor:
-
-```json
-{
-    "schema_version": 1,
-    "key": "monthly-sales",
-    "title": "Monthly Sales",
-    "data": {
-        "source": "sales"
-    },
-    "bands": {
-        "document_header": [
-            { "type": "heading", "level": 1, "content": "Monthly Sales" }
-        ],
-        "detail": [
-            {
-                "type": "table",
-                "columns": [
-                    { "field": "invoice_no", "label": "Invoice" },
-                    { "field": "total", "label": "Total", "align": "right" }
-                ]
-            }
-        ]
-    }
-}
-```
-
-Press **Create**.
-
-If anything is wrong, the form reports the exact path that failed — for example
-`Unknown band "detials"` — rather than a generic "invalid document" message. Nothing is
-saved until the whole document is valid.
-
-### What the bands mean
-
-The `bands` key is what makes this a report rather than a static page. Each band is
-rendered at a different point:
-
-| Band | Rendered |
+| Field | Example |
 |---|---|
-| `document_header` | Once, at the start |
-| `page_header` | On every page (paginated output only) |
-| `group_header` | Each time a grouping value changes |
-| `detail` | **Once per row of data** |
-| `group_footer` | At the end of each group — subtotals |
-| `page_footer` | On every page (paginated output only) |
-| `document_footer` | Once, at the end — grand totals |
+| Title | `User Directory` |
+| Key | `user-directory` — how code calls it; cannot be changed later |
 
-Only the bands you actually use need to be present.
+## 3. Choose the data
 
-## 4. Load the template from code
+Open the **Data** tab and pick a **Data source**. The preview on the right starts showing
+the report as soon as there is something to show.
+
+Optionally sort, group or filter the rows here.
+
+## 4. Lay out the report
+
+Open the **Layout** tab.
+
+1. In **Document header**, add a **Heading** block and type `User Directory`.
+2. In **Detail**, add a **Table** block. Add a column per field you want to list — pick the
+   field, and its label fills in.
+3. In **Document footer**, add a **Text** block, type `Total users:`, then press
+   **Insert field**, choose a field and **Count**.
+
+Drag blocks to reorder them. The preview follows every change.
+
+## 5. Save
+
+Press **Create**. If something is wrong the form says what and where, and nothing is saved
+until the design is valid.
+
+## 6. Render it from code
 
 ```php
+use ReportBrains\ReportDesigner\Compiler\ReportCompiler;
+use ReportBrains\ReportDesigner\DataSources\ReportQueryFactory;
+use ReportBrains\ReportDesigner\Renderers\MarkdownRenderer;
 use ReportBrains\ReportDesigner\TemplateRepository;
 
-$template = app(TemplateRepository::class)->find('monthly-sales');
+$document = app(TemplateRepository::class)->find('user-directory')->schema;
 
-$template->title;   // "Monthly Sales"
-$template->schema;  // the document, as an array
+$query  = app(ReportQueryFactory::class)->make($document, []);
+$rows   = app(ReportQueryFactory::class)->sourceFor($document)->rows($query);
+$report = app(ReportCompiler::class)->compile($document, $rows, $query->parameters);
+
+$markdown = (new MarkdownRenderer)->render($report);
 ```
 
-## 5. Ship a template as a file instead
+A single call for this sequence arrives in M6.
+
+## Templates as files
 
 Templates can also live in version control, which makes them reviewable in pull requests.
-Put the same JSON in `resources/reports/monthly-sales.json`:
+Design one in the panel, copy the document from the **JSON** tab into
+`resources/reports/user-directory.json`, and load it with:
 
 ```php
-$document = app(TemplateRepository::class)->fromFileKey('monthly-sales');
+$document = app(TemplateRepository::class)->fromFileKey('user-directory');
 ```
 
-File templates are read-only and are validated on every read, exactly like stored ones.
+File templates are read-only and are validated on every read.
 
-## What comes next
+## Next
 
-Right now a template is a validated document and nothing more — there is no data binding
-and no rendering yet. `data.source` is recorded but not resolved; `{{ ... }}` expressions
-are stored verbatim. Those arrive in M2 and M3.
+- [The visual designer](10-visual-designer.md) — every tab and block in detail
+- [Expressions and rendering](09-expressions-and-rendering.md) — totals, formats, output

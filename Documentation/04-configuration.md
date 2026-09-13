@@ -76,3 +76,30 @@ read.
 `..` or as an absolute path — throws `TemplateNotFound` rather than being read. This matters
 because template paths can come from configuration or from a request, and without the guard
 `../../.env` would resolve to a readable file.
+
+## `preview.max_rows`
+
+```php
+'preview' => [
+    'max_rows' => 25,
+],
+```
+
+The most rows the designer's live preview reads. The preview runs against real data on every
+change, so this keeps editing a template from pulling a whole table.
+
+## `formatting`
+
+Separators, currency symbol and date formats used by the `currency`, `number`, `date` and
+related formatters. See [Expressions and rendering](09-expressions-and-rendering.md#formatting-configuration).
+
+## Plugin options
+
+Set on the plugin where it is registered, rather than in the config file:
+
+```php
+$panel->plugin(
+    ReportDesignerPlugin::make()
+        ->jsonEditor(false), // hide the JSON tab and Import JSON action
+);
+```

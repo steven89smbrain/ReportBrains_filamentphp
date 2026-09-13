@@ -52,7 +52,14 @@ public function panel(Panel $panel): Panel
 }
 ```
 
-The plugin registers its own resources and pages, so nothing else needs listing.
+The plugin registers its own resources, so nothing else needs listing.
+
+For a panel whose users design reports visually and should never see the underlying JSON,
+switch the developer tools off:
+
+```php
+->plugin(ReportDesignerPlugin::make()->jsonEditor(false));
+```
 
 ## Panel access
 

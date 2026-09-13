@@ -17,10 +17,8 @@ bagian dari produk yang dijual. Semua yang menghadap pengguna (UI plugin dan
 
 ## Posisi saat ini
 
-**M0–M3 selesai.** Report sudah menghasilkan keluaran: template tersimpan, terhubung ke data
-lewat whitelist, dikompilasi dengan pengelompokan dan subtotal, lalu dirender jadi Markdown
-atau HTML. 122 test lulus.
+**M0–M4 selesai.** Report bisa dirancang lewat editor visual di panel (drag-and-drop per band,
+pilih field berdasarkan label, sisip total tanpa mengetik ekspresi), dipreview langsung dengan data
+sungguhan, lalu dirender jadi Markdown atau HTML. 148 test lulus.
 
-**Berikutnya: M4 — editor visual.** Inilah yang membuat produk bisa dijual ke pengguna yang
-tidak menulis JSON. Sesuai keputusan K2, editornya berlapis: ramah pengguna bisnis sebagai
-tampilan utama, plus tampilan JSON untuk developer.
+**Berikutnya:** putuskan K9 (parameter yang memfilter data), lalu M5 (PDF) dan M6 (distribusi).

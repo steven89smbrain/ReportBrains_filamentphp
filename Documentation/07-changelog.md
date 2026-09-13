@@ -4,6 +4,54 @@ Milestones as they complete. Roadmap for the unbuilt ones is in `Planning/04-roa
 
 ---
 
+## M4 — Visual designer · 13 Sep 2026
+
+Reports can now be designed in the panel without writing JSON.
+
+**Designer**
+- Tabbed designer — **Layout**, **Data**, **Page** and **JSON** — beside a live preview
+- One drag-and-drop builder per band, with heading, text, table, divider and spacer blocks
+- Table columns picked from the source's fields by label; the column label fills in from the
+  field
+- **Insert field** action on headings and text: pick a field, a total or average, and a format,
+  and the placeholder is written for you
+- Data tab: source, grouping, multi-level sorting and filters whose operators follow the field
+  type
+- Page tab: paper size, orientation and margins
+
+**Preview**
+- `ReportPreview` renders the design against live data on every change, capped at
+  `preview.max_rows` (default 25)
+- Parameters fall back to their defaults, so reports with required parameters still preview
+- Incomplete designs show what is missing instead of an error page; data boundaries still apply
+
+**Saving**
+- `DocumentFormMapper` translates between the designer's form state and the stored document,
+  so the form's shape never leaks into storage; a document round-trips unchanged
+- Saving validates the schema and every binding; whole-design problems stop the save with a
+  notification. `ReportQueryFactory::validateBindings()` makes that check possible before any
+  parameters exist
+- Stored `params` are preserved when a design is saved
+
+**Developers**
+- Read-only JSON tab and an **Import JSON** action; `ReportDesignerPlugin::jsonEditor(false)`
+  hides both
+
+**Removed**
+- The M0 placeholder "Reports" page, now superseded by the designer
+
+**Tests** — 26 added (148 total), including the mapper round trip, preview boundaries and designer
+create, edit and import flows.
+
+### Not included
+
+Filters are built with the designer's own whitelist-bound controls rather than Filament's
+query builder, which applies conditions directly to an Eloquent query and would bypass the
+source whitelist. Report parameters cannot yet be edited in the designer, and do not yet
+filter data.
+
+---
+
 ## M3 — Compiler and renderers · 11 Sep 2026
 
 Reports now produce output. A template stored in the panel can be bound to data, compiled
