@@ -23,9 +23,6 @@ access left in it. Renderers only translate that tree into their target syntax. 
 follow: adding an output format means writing one renderer and touching nothing else, and
 renderers can be tested without a database.
 
-> The compiler and renderers are not built yet (M2–M3). The storage and validation layers
-> described below are.
-
 ## Package layout
 
 The plugin is the product; the surrounding Laravel application is only a harness for
@@ -69,8 +66,19 @@ A document that saves cleanly but is malformed will fail later, at render time, 
 cause is much harder to trace. Putting the check at the storage boundary means no path —
 panel, seeder, import, console command — can get a bad document into the table.
 
-The Filament form additionally applies `ValidReportSchema`, so the user sees field-level
-errors instead of an exception page. Both routes run the same validator.
+The designer also validates before saving, so people see what is wrong instead of an
+exception page. Its pages build the document with `DocumentFormMapper`, then run the same
+`ReportSchema` validator plus `ReportQueryFactory::validateBindings()`, which checks every
+column, sort, group and filter against the source's whitelist without needing parameter
+values. Field-level problems are marked on the field; whole-design problems stop the save with
+a notification.
+
+## The designer never shapes storage
+
+Filament's builder keeps blocks as `{type, data}` items keyed by UUID, and a list filter value
+is typed as comma-separated text. None of that reaches the database: `DocumentFormMapper`
+translates in both directions, and a document round-trips through the designer unchanged.
+The live preview renders from the same mapped document, capped at `preview.max_rows`.
 
 ### Errors are keyed by path
 
@@ -125,7 +133,9 @@ designer makes.
 | Malformed documents reaching storage | Validated at the model's `saving` hook, not only in the form |
 | Duplicate keys within a tenant | Unique index, plus `UniqueTemplateKey` for the untenanted case SQL cannot constrain |
 | Cross-tenant leakage | `scopeVisible()` on every designer query |
-| Code execution via expressions | `{{ ... }}` is stored verbatim and never evaluated as PHP. The evaluator planned for M3 is a restricted expression language, not Blade |
+| Code execution via expressions | `{{ ... }}` goes through a sandboxed evaluator that accepts only field and parameter references and allow-listed aggregates and formatters — never Blade or `eval` |
+| Unexposed data via the designer or preview | Field pickers offer only whitelisted fields; saving and the preview both enforce the whitelist and scopes |
+| Script injection in rendered output | Markdown and HTML renderers escape every value |
 
 ## Database portability
 
