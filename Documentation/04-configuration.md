@@ -88,6 +88,18 @@ because template paths can come from configuration or from a request, and withou
 The most rows the designer's live preview reads. The preview runs against real data on every
 change, so this keeps editing a template from pulling a whole table.
 
+## `pdf.driver`
+
+```php
+'pdf' => [
+    'driver' => env('REPORT_DESIGNER_PDF_DRIVER', 'chrome'),
+],
+```
+
+Which spatie/laravel-pdf driver prints PDFs: `chrome` (recommended), `browsershot`,
+`gotenberg` or `dompdf`. Set it to `null` to fall back to laravel-pdf's own default. See
+[PDF output](11-pdf-output.md#choosing-a-driver).
+
 ## `formatting`
 
 Separators, currency symbol and date formats used by the `currency`, `number`, `date` and

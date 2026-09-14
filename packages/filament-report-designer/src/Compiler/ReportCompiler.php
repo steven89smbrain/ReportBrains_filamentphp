@@ -42,17 +42,21 @@ class ReportCompiler
 
         $bands = [];
 
-        foreach ([BandName::DocumentHeader, BandName::PageHeader] as $name) {
-            $bands = [...$bands, ...$this->staticBand($name, $bandDefinitions, $context)];
-        }
+        $bands = [
+            ...$bands,
+            ...$this->staticBand(BandName::DocumentHeader, $bandDefinitions, $context),
+            ...$this->staticBand(BandName::PageHeader, $bandDefinitions, $context->withPagination()),
+        ];
 
         $bands = [...$bands, ...($groupBy === []
             ? $this->detailBands($bandDefinitions, $rows, $context)
             : $this->groupedBands($bandDefinitions, $rows, (string) $groupBy[0], $context))];
 
-        foreach ([BandName::PageFooter, BandName::DocumentFooter] as $name) {
-            $bands = [...$bands, ...$this->staticBand($name, $bandDefinitions, $context)];
-        }
+        $bands = [
+            ...$bands,
+            ...$this->staticBand(BandName::PageFooter, $bandDefinitions, $context->withPagination()),
+            ...$this->staticBand(BandName::DocumentFooter, $bandDefinitions, $context),
+        ];
 
         return new RenderedReport(
             title: (string) ($document['title'] ?? ''),

@@ -5,19 +5,8 @@ milestone yang isinya hanya "menyiapkan struktur".
 
 Estimasi memakai satuan relatif (S/M/L), bukan tanggal, karena kecepatan pengerjaan belum diketahui.
 
-> **M0–M4 sudah selesai** — rinciannya di
+> **M0–M5 sudah selesai** — rinciannya di
 > [`Documentation/07-changelog.md`](../Documentation/07-changelog.md).
-
----
-
-## M5 — PDF · M
-
-- [ ] Pilih paket PDF (uji `--dry-run` di PHP 8.5 dulu — lihat K3 di [05](05-keputusan-terbuka.md))
-- [ ] Page setup: ukuran, orientasi, margin
-- [ ] Header/footer halaman + nomor halaman
-- [ ] Renderer PDF + test
-
-**Selesai bila:** report yang sama menghasilkan PDF rapi dan MD, dari satu template.
 
 ---
 
@@ -49,15 +38,29 @@ Dikerjakan berdasarkan umpan balik pemakaian nyata, bukan tebakan:
 
 ---
 
+## M8 — Desainer kanvas ala Canva · L — **usulan, menunggu K10**
+
+Jenis dokumen kedua dengan kanvas bebas (posisi, ukuran, rotasi, lapisan), keluaran PDF.
+
+- [ ] Jawab K10 (kegunaan, terikat data atau tidak, satu/banyak halaman, cakupan fitur)
+- [ ] Skema dokumen kanvas + validator (terpisah dari dokumen report)
+- [ ] Editor kanvas di browser (Fabric.js atau Konva, keduanya MIT)
+- [ ] Renderer kanvas → HTML berposisi absolut → PDF lewat driver yang sama (K3)
+- [ ] Binding data per halaman (jika K10 memilih "terikat data")
+
+**Selesai bila:** desain yang dibuat di kanvas tercetak ke PDF identik dengan yang tampil di editor.
+
+---
+
 ## Posisi sekarang
 
-Sejak M4, **produk sudah layak didemokan**: report bisa dirancang lewat UI, dipreview dengan data
-sungguhan, dan dirender jadi Markdown/HTML.
+Report sudah bisa dirancang visual, difilter dengan parameter, dan diekspor ke **PDF**, HTML, atau
+Markdown dari panel. Secara fitur, produk sudah lengkap untuk rilis pertama.
 
 Yang masih memisahkan dari **rilis berbayar pertama**:
 
-1. **Jalur distribusi** (bagian dari M6) — tanpa itu produk tidak bisa dijual.
-2. **M5 (PDF)** — hampir pasti diminta pembeli, tapi bisa menyusul setelah rilis pertama.
+1. **M6 — jalur distribusi** (private Packagist/Anystack) dan API runtime yang rapi. Tanpa ini
+   produk tidak bisa dijual.
+2. **K8 — akses panel** di aplikasi demo sebelum dipakai untuk demo publik.
 
-K9 (parameter yang memfilter data) sudah selesai, dan aplikasi demo kini punya data contoh
-penjualan (`php artisan db:seed --class=DemoReportSeeder`) untuk demo ke calon pembeli.
+Editor kanvas ala Canva (M8) sebaiknya **setelah** rilis pertama, dan setelah K10 dijawab.

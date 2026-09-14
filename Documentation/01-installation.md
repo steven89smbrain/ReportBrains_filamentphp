@@ -21,6 +21,18 @@ Once distribution is set up, installation will be:
 composer require reportbrains/filament-report-designer
 ```
 
+## Installing a PDF driver
+
+PDF output needs one PDF driver. The recommended one prints with Chrome:
+
+```bash
+composer require chrome-php/chrome
+```
+
+It also needs Google Chrome or Chromium installed on the server. Other drivers, and the
+trade-offs between them, are covered in [PDF output](11-pdf-output.md#choosing-a-driver).
+Markdown and HTML output need nothing extra.
+
 ## Running the migration
 
 The package ships one migration, which creates the `report_templates` table. It is loaded

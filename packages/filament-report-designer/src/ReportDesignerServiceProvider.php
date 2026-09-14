@@ -34,6 +34,7 @@ class ReportDesignerServiceProvider extends ServiceProvider
         $this->app->singleton(ValueFormatter::class);
         $this->app->singleton(ExpressionEvaluator::class);
         $this->app->singleton(ReportCompiler::class);
+        $this->app->singleton(ReportRunner::class);
     }
 
     public function boot(): void

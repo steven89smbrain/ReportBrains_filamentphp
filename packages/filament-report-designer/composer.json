@@ -13,7 +13,13 @@
     "require": {
         "php": "^8.3",
         "filament/filament": "^5.0",
-        "illuminate/contracts": "^13.0"
+        "illuminate/contracts": "^13.0",
+        "spatie/laravel-pdf": "^2.13"
+    },
+    "suggest": {
+        "chrome-php/chrome": "Recommended PDF driver: renders with an installed Chrome or Chromium, no Node required (^1.16)",
+        "spatie/browsershot": "PDF driver using headless Chrome through Node and Puppeteer (^5.0)",
+        "dompdf/dompdf": "Pure-PHP PDF driver with no external dependencies; limited CSS, so output will not match the designer preview (^3.0)"
     },
     "autoload": {
         "psr-4": {

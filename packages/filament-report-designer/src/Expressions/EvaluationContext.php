@@ -17,12 +17,14 @@ class EvaluationContext
      * @param  array<int, array<string, mixed>>  $rows  Rows in scope for aggregates.
      * @param  array<string, mixed>  $parameters
      * @param  array<string, mixed>  $group  Current group's field and value.
+     * @param  bool  $paginated  Whether this is a page header or footer, where page numbers exist.
      */
     public function __construct(
         public readonly array $row = [],
         public readonly array $rows = [],
         public readonly array $parameters = [],
         public readonly array $group = [],
+        public readonly bool $paginated = false,
     ) {}
 
     /**
@@ -30,7 +32,7 @@ class EvaluationContext
      */
     public function withRow(array $row): self
     {
-        return new self($row, $this->rows, $this->parameters, $this->group);
+        return new self($row, $this->rows, $this->parameters, $this->group, $this->paginated);
     }
 
     /**
@@ -38,7 +40,7 @@ class EvaluationContext
      */
     public function withRows(array $rows): self
     {
-        return new self($this->row, $rows, $this->parameters, $this->group);
+        return new self($this->row, $rows, $this->parameters, $this->group, $this->paginated);
     }
 
     /**
@@ -46,6 +48,11 @@ class EvaluationContext
      */
     public function withGroup(array $group): self
     {
-        return new self($this->row, $this->rows, $this->parameters, $group);
+        return new self($this->row, $this->rows, $this->parameters, $group, $this->paginated);
+    }
+
+    public function withPagination(): self
+    {
+        return new self($this->row, $this->rows, $this->parameters, $this->group, true);
     }
 }

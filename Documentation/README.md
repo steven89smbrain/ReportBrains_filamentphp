@@ -3,9 +3,8 @@
 A Filament plugin for designing reports. Templates are stored as JSON documents and
 are rendered to Markdown, HTML, PDF or spreadsheets.
 
-> **Status: in development.** Reports can be designed visually in the panel, bound to data
-> and rendered to Markdown or HTML today. PDF output does not exist yet — see
-> [What works today](#what-works-today).
+> **Status: in development.** Reports can be designed visually in the panel, bound to data,
+> and exported as PDF, HTML or Markdown today — see [What works today](#what-works-today).
 > This documentation only describes behaviour that is implemented and covered by tests.
 
 ## Contents
@@ -22,6 +21,7 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | [08 — Data sources](08-data-sources.md) | Exposing data to reports, safely |
 | [09 — Expressions and rendering](09-expressions-and-rendering.md) | The `{{ }}` language, formatting, and the Markdown/HTML renderers |
 | [10 — The visual designer](10-visual-designer.md) | Designing reports in the panel, with live preview |
+| [11 — PDF output](11-pdf-output.md) | Drivers, page setup, page numbers and exporting |
 
 ## What works today
 
@@ -41,7 +41,8 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | Markdown and HTML rendering | ✅ Working |
 | Sandboxed `{{ }}` expressions and aggregates | ✅ Working |
 | Grouping with subtotals and grand totals | ✅ Working |
-| PDF rendering | ⏳ Planned (M5) |
+| PDF output with page headers, footers and page numbers | ✅ Working |
+| Export to PDF, HTML or Markdown from the panel | ✅ Working |
 
 Planning documents for the unbuilt milestones live in `Planning/`.
 

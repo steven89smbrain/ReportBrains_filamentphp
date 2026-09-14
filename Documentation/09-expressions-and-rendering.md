@@ -26,6 +26,9 @@ container, a facade or the request.
 {{ sum(total) | currency }}  any of the above, formatted
 ```
 
+In the **page header** and **page footer** bands only, `{{ page.number }}` and
+`{{ page.total }}` print page numbers in PDF output — see [PDF output](11-pdf-output.md).
+
 A field name containing a dot (`customer.name`) is matched as a whole name, not traversed,
 so relation fields work as written.
 

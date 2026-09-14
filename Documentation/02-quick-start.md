@@ -61,24 +61,25 @@ Drag blocks to reorder them. The preview follows every change.
 Press **Create**. If something is wrong the form says what and where, and nothing is saved
 until the design is valid.
 
-## 6. Render it from code
+## 6. Export it
+
+On the template's edit page, press **Export**, choose **PDF**, **HTML** or **Markdown**, and
+download. PDF needs a driver installed — see [PDF output](11-pdf-output.md).
+
+## 7. Render it from code
 
 ```php
-use ReportBrains\ReportDesigner\Compiler\ReportCompiler;
-use ReportBrains\ReportDesigner\DataSources\ReportQueryFactory;
 use ReportBrains\ReportDesigner\Renderers\MarkdownRenderer;
+use ReportBrains\ReportDesigner\Renderers\PdfRenderer;
+use ReportBrains\ReportDesigner\ReportRunner;
 use ReportBrains\ReportDesigner\TemplateRepository;
 
 $document = app(TemplateRepository::class)->find('user-directory')->schema;
+$runner = app(ReportRunner::class);
 
-$query  = app(ReportQueryFactory::class)->make($document, []);
-$rows   = app(ReportQueryFactory::class)->sourceFor($document)->rows($query);
-$report = app(ReportCompiler::class)->compile($document, $rows, $query->parameters);
-
-$markdown = (new MarkdownRenderer)->render($report);
+$markdown = $runner->render($document, new MarkdownRenderer);
+$pdf = $runner->render($document, app(PdfRenderer::class));
 ```
-
-A single call for this sequence arrives in M6.
 
 ## Templates as files
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use ReportBrains\ReportDesigner\Exceptions\InvalidExpression;
 use ReportBrains\ReportDesigner\Expressions\EvaluationContext;
 use ReportBrains\ReportDesigner\Expressions\ExpressionEvaluator;
+use ReportBrains\ReportDesigner\Expressions\PageToken;
 
 beforeEach(function () {
     $this->evaluator = app(ExpressionEvaluator::class);
@@ -140,5 +141,24 @@ describe('the sandbox', function () {
         $context = new EvaluationContext(row: ['note' => '<?php echo "x"; ?>']);
 
         expect($this->evaluator->render('{{ note }}', $context))->toBe('<?php echo "x"; ?>');
+    });
+});
+
+describe('page numbers', function () {
+    it('emits page-number tokens in a page header or footer', function () {
+        $context = (new EvaluationContext)->withPagination();
+
+        expect($this->evaluator->render('Page {{ page.number }} of {{ page.total }}', $context))
+            ->toBe('Page '.PageToken::NUMBER.' of '.PageToken::TOTAL);
+    });
+
+    it('refuses page numbers outside the page header and footer', function () {
+        $this->evaluator->render('Page {{ page.number }}', $this->context);
+    })->throws(InvalidExpression::class, 'only available in the page header and page footer');
+
+    it('leaves a page-number token unformatted so it survives to the PDF', function () {
+        $context = (new EvaluationContext)->withPagination();
+
+        expect($this->evaluator->render('{{ page.number | upper }}', $context))->toBe(PageToken::NUMBER);
     });
 });

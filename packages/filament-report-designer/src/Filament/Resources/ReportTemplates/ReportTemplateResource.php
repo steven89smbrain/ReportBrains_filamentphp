@@ -296,7 +296,11 @@ class ReportTemplateResource extends Resource
                     ->modalSubmitActionLabel('Insert')
                     ->schema(fn (Livewire $livewire): array => [
                         Select::make('field')
-                            ->options(static::fieldOptions($livewire))
+                            ->options([
+                                ...static::fieldOptions($livewire),
+                                'page.number' => 'Page number (page header and footer only)',
+                                'page.total' => 'Total pages (page header and footer only)',
+                            ])
                             ->required()
                             ->searchable(),
                         Select::make('aggregate')
@@ -315,11 +319,13 @@ class ReportTemplateResource extends Resource
                             ->placeholder('None'),
                     ])
                     ->action(function (array $data, Get $get, Set $set): void {
-                        $expression = filled($data['aggregate'] ?? null)
+                        $isPageNumber = str_starts_with((string) $data['field'], 'page.');
+
+                        $expression = filled($data['aggregate'] ?? null) && ! $isPageNumber
                             ? "{$data['aggregate']}({$data['field']})"
                             : $data['field'];
 
-                        if (filled($data['format'] ?? null)) {
+                        if (filled($data['format'] ?? null) && ! $isPageNumber) {
                             $expression .= " | {$data['format']}";
                         }
 
@@ -507,21 +513,33 @@ class ReportTemplateResource extends Resource
     {
         $source = static::selectedSource($livewire);
 
-        if ($source === null) {
-            return [];
-        }
+        return $source === null ? [] : static::parameterInputs($source, forPreview: true);
+    }
 
+    /**
+     * An input per parameter a source declares, typed to match.
+     *
+     * In the preview every parameter is optional and updates live; when running
+     * a report for real, required parameters are enforced and defaults filled in.
+     *
+     * @return array<int, mixed>
+     */
+    public static function parameterInputs(DataSource $source, bool $forPreview = false): array
+    {
         return array_values(array_map(
-            fn (Parameter $parameter): mixed => (match ($parameter->type) {
-                FieldType::Date => DatePicker::make($parameter->name),
-                FieldType::DateTime => DateTimePicker::make($parameter->name),
-                FieldType::Boolean => Toggle::make($parameter->name)->inline(false),
-                FieldType::Number, FieldType::Currency => TextInput::make($parameter->name)->numeric(),
-                FieldType::String => TextInput::make($parameter->name),
-            })
-                ->label($parameter->label)
-                ->live(onBlur: true)
-                ->dehydrated(false),
+            function (Parameter $parameter) use ($forPreview): mixed {
+                $input = (match ($parameter->type) {
+                    FieldType::Date => DatePicker::make($parameter->name),
+                    FieldType::DateTime => DateTimePicker::make($parameter->name),
+                    FieldType::Boolean => Toggle::make($parameter->name)->inline(false),
+                    FieldType::Number, FieldType::Currency => TextInput::make($parameter->name)->numeric(),
+                    FieldType::String => TextInput::make($parameter->name),
+                })->label($parameter->label);
+
+                return $forPreview
+                    ? $input->live(onBlur: true)->dehydrated(false)
+                    : $input->required($parameter->required)->default($parameter->default);
+            },
             $source->parameters(),
         ));
     }

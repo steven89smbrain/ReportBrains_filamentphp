@@ -93,7 +93,11 @@ in the document footer.
 
 ## The Page tab
 
-Paper size, orientation and margins. These only affect paginated output such as PDF.
+Paper size, orientation and margins, used for PDF output. The **Page header** and **Page
+footer** bands on the Layout tab print on every page; use **Insert field → Page number** or
+**Total pages** in them. See [PDF output](11-pdf-output.md).
+
+The live preview shows the report body only — page headers and footers appear in the PDF.
 
 ## The preview
 
@@ -109,6 +113,12 @@ The preview re-renders as you edit, against live data from the chosen source.
   for example `Choose a data source to see a preview.`
 - The preview enforces the same data boundaries as a real run: scopes apply, and fields a
   source does not expose cannot appear.
+
+## Exporting
+
+Once saved, a template's edit page has an **Export** action: pick **PDF**, **HTML** or
+**Markdown**, fill in any parameters, and download. Export runs the saved template, so save
+first to include recent changes.
 
 ## Saving
 

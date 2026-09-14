@@ -41,6 +41,20 @@ class HtmlRenderer implements Renderer
             : $this->document($report, $content);
     }
 
+    /**
+     * Render only the given bands, with no document around them — used for PDF
+     * page headers and footers.
+     *
+     * @param  array<int, RenderedBand>  $bands
+     */
+    public function renderBands(array $bands): string
+    {
+        return implode("\n", array_filter(
+            array_map($this->band(...), $bands),
+            fn (string $band): bool => $band !== '',
+        ));
+    }
+
     public function extension(): string
     {
         return 'html';

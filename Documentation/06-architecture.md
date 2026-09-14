@@ -36,12 +36,13 @@ packages/filament-report-designer/
     ├── ReportDesignerPlugin.php    Filament entry point, plugin options
     ├── ReportDesignerServiceProvider.php
     ├── TemplateRepository.php      Loads documents from the database or disk
+    ├── ReportRunner.php            Document + parameters → rows → rendered output
     ├── Models/ReportTemplate.php   Stored document
     ├── Schema/                     Document format: validator, bands, block types
     ├── DataSources/                Registry, whitelist, query factory
     ├── Expressions/                Sandboxed {{ }} evaluator and formatters
     ├── Compiler/                   Document + rows → RenderedReport
-    ├── Renderers/                  Markdown and HTML
+    ├── Renderers/                  Markdown, HTML and PDF
     ├── Designer/                   Form state ⇄ document mapping, live preview
     ├── Filament/                   The template resource and its pages
     ├── Facades/ReportData.php

@@ -17,9 +17,9 @@ bagian dari produk yang dijual. Semua yang menghadap pengguna (UI plugin dan
 
 ## Posisi saat ini
 
-**M0–M4 dan K9 selesai.** Report dirancang lewat editor visual, filternya bisa digerakkan
-parameter (termasuk rentang tanggal), dipreview langsung dengan data sungguhan, lalu dirender jadi
-Markdown atau HTML. Aplikasi demo punya data contoh penjualan dan tiga template siap pakai.
-176 test lulus.
+**M0–M5 dan K9 selesai.** Report dirancang lewat editor visual, filternya digerakkan parameter,
+dipreview dengan data sungguhan, dan diekspor ke PDF (lewat Chrome), HTML, atau Markdown langsung
+dari panel. 196 test lulus.
 
-**Berikutnya:** M5 (PDF) — tapi putuskan K3 (paket PDF) dulu — dan M6 (distribusi).
+**Berikutnya:** M6 (distribusi & API runtime). Editor kanvas ala Canva diusulkan sebagai M8 — jawab
+K10 dulu.

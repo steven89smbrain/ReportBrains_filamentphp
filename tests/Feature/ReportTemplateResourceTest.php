@@ -14,6 +14,7 @@ use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\EditRep
 use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\Pages\ListReportTemplates;
 use ReportBrains\ReportDesigner\Models\ReportTemplate;
 use ReportBrains\ReportDesigner\Rules\RegisteredDataSource;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 beforeEach(function () {
     $this->user = User::factory()->create(['name' => 'Ada Lovelace', 'email' => 'ada@example.com']);
@@ -284,4 +285,44 @@ it('names the available sources when the one asked for is missing', function () 
     );
 
     expect($messages)->toBe(['The data source [payroll] is not registered. Available: users, orders.']);
+});
+
+describe('exporting', function () {
+    beforeEach(function () {
+        $this->template = ReportTemplate::create([
+            'key' => 'user-directory',
+            'title' => 'User Directory',
+            'schema' => validReportDocument(),
+        ]);
+
+        $this->filename = fn (string $extension): string => 'user-directory-'.now()->format('Y-m-d').'.'.$extension;
+    });
+
+    it('downloads the saved report as Markdown', function () {
+        Livewire::test(EditReportTemplate::class, ['record' => $this->template->getRouteKey()])
+            ->callAction('export', data: ['format' => 'markdown'])
+            ->assertFileDownloaded(($this->filename)('md'));
+    });
+
+    it('downloads the saved report as a PDF', function () {
+        Pdf::fake();
+
+        Livewire::test(EditReportTemplate::class, ['record' => $this->template->getRouteKey()])
+            ->callAction('export', data: ['format' => 'pdf'])
+            ->assertFileDownloaded(($this->filename)('pdf'));
+
+        Pdf::assertSee('ada@example.com');
+    });
+
+    it('explains a report it cannot run instead of failing', function () {
+        // The email field was exposed when the template was saved, and since removed.
+        ReportData::eloquent('users', User::class, function ($source): void {
+            $source->setLabel('Users')->addField('name', 'Name')->addField('created_at', 'Registered at');
+        });
+
+        Livewire::test(EditReportTemplate::class, ['record' => $this->template->getRouteKey()])
+            ->callAction('export', data: ['format' => 'markdown'])
+            ->assertNotified('The report could not be exported')
+            ->assertNoFileDownloaded();
+    });
 });

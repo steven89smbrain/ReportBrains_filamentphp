@@ -37,6 +37,11 @@ class InvalidExpression extends RuntimeException
         ));
     }
 
+    public static function pageNumberOutsidePageBand(string $reference): self
+    {
+        return new self("[{$reference}] is only available in the page header and page footer, where a PDF has page numbers.");
+    }
+
     public static function unknownReference(string $reference): self
     {
         return new self("The expression refers to [{$reference}], which is not a field, parameter or group value available here.");

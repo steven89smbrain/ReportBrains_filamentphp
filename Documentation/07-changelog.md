@@ -4,6 +4,38 @@ Milestones as they complete. Roadmap for the unbuilt ones is in `Planning/04-roa
 
 ---
 
+## M5 — PDF output · 14 Sep 2026
+
+Reports now print to PDF, and any template can be exported from the panel.
+
+**Rendering**
+- `PdfRenderer` prints the same HTML the designer previews through spatie/laravel-pdf (MIT)
+- The engine is a configuration choice, `report-designer.pdf.driver`: `chrome` by default,
+  or `browsershot`, `gotenberg`, `dompdf`. All are open source; none needs a subscription
+- Chromium-based drivers are recommended because they lay pages out as the preview does
+- The package requires laravel-pdf and only *suggests* a driver, so buyers choose what their
+  servers can run
+
+**Page setup**
+- Paper size, orientation and margins from the document; A4 portrait with 15 mm margins by
+  default, 25 mm where a page header or footer needs room
+- Table header rows repeat on every page; rows are not split across a break
+
+**Page headers, footers and numbers**
+- The page header and footer bands print on every page
+- `{{ page.number }}` and `{{ page.total }}`, available in those bands only and offered by
+  **Insert field**; anywhere else they are refused with an explanation
+
+**Export**
+- **Export** action on the edit page: PDF, HTML or Markdown, with the report's parameters
+- Driver failures are shown as a notification with the reason, not an error page
+- `ReportRunner` runs a document end to end from code
+
+**Tests** — 20 added (196 total), including a real Chrome print that checks for a
+multi-page PDF — skipped where no Chrome binary exists.
+
+---
+
 ## Report parameters in filters · 13 Sep 2026
 
 Parameters now narrow the data a report reads, so a template can serve any date range.

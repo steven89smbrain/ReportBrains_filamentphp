@@ -74,7 +74,11 @@ class ExpressionEvaluator
 
         $formatter = $matches['formatter'] ?? '';
 
-        return $formatter === '' ? $value : $this->formatter->format($value, $formatter);
+        // A formatter would mangle a page-number token, and a page number is
+        // already a plain integer, so tokens pass through unformatted.
+        return $formatter === '' || PageToken::isToken($value)
+            ? $value
+            : $this->formatter->format($value, $formatter);
     }
 
     /**
@@ -87,6 +91,17 @@ class ExpressionEvaluator
         // traversal, or "customer.name" would be read as row[customer][name].
         if (array_key_exists($path, $context->row)) {
             return $context->row[$path];
+        }
+
+        if ($path === 'page.number' || $path === 'page.total') {
+            // Page numbers only exist once a PDF is laid out, so they can only be
+            // used in the page header and footer, where the PDF renderer swaps
+            // these tokens for the browser's own page counters.
+            if (! $context->paginated) {
+                throw InvalidExpression::pageNumberOutsidePageBand($path);
+            }
+
+            return $path === 'page.number' ? PageToken::NUMBER : PageToken::TOTAL;
         }
 
         if (str_starts_with($path, 'params.')) {

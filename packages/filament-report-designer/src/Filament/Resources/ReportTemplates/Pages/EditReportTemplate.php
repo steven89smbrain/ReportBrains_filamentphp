@@ -18,7 +18,7 @@ class EditReportTemplate extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [$this->importJsonAction(), DeleteAction::make()];
+        return [$this->exportAction(), $this->importJsonAction(), DeleteAction::make()];
     }
 
     /**

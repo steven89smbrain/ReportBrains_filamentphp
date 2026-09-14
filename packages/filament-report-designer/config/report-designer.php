@@ -64,6 +64,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | PDF output
+    |--------------------------------------------------------------------------
+    |
+    | PDFs are printed by spatie/laravel-pdf. "driver" names one of its drivers:
+    | "chrome" (recommended — needs Chrome or Chromium and chrome-php/chrome),
+    | "browsershot" (Chrome through Node), "gotenberg" (a self-hosted Docker
+    | service) or "dompdf" (pure PHP, but its limited CSS will not match the
+    | designer preview). Set it to null to use laravel-pdf's own default.
+    | Each driver's settings live in config/laravel-pdf.php.
+    |
+    */
+
+    'pdf' => [
+        'driver' => env('REPORT_DESIGNER_PDF_DRIVER', 'chrome'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Formatting
     |--------------------------------------------------------------------------
     |

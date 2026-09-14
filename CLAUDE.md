@@ -51,9 +51,20 @@ project, so treat the package as a distributable product rather than app code.
   sources are registered in `AppServiceProvider`. `DemoReportSeederTest` renders every sample, so a
   change that breaks them fails the suite. Test fixture tables are prefixed `fixture_` so they never
   collide with the demo tables.
-- Status: M0–M4 and K9 done (storage, validation, data sources, compiler, Markdown/HTML, visual
-  designer with live preview, parameter-driven filters, sample data). Next is M5 PDF (decide K3
-  first) and M6 distribution. Relation fields cannot be sorted or filtered on.
+- **PDF goes through spatie/laravel-pdf, and the driver is configuration** (`report-designer.pdf.driver`,
+  default `chrome`). The package requires laravel-pdf but only *suggests* drivers — never hard-require
+  one; buyers pick what their servers can run. Chromium drivers are the recommendation because the
+  PDF must match the browser preview. `PdfRenderer` must keep printing through the `Pdf` facade so
+  `Pdf::fake()` works in tests.
+- **`{{ page.number }}` / `{{ page.total }}` exist only in the page header/footer bands.** The compiler
+  gives those bands a paginated `EvaluationContext`; the evaluator emits `PageToken` placeholders that
+  only `PdfRenderer` swaps for Chrome's page counters. Anywhere else they must stay refused.
+- `PdfGenerationTest` prints a real PDF through Chrome and skips when no Chrome binary is found; run it
+  alone with `php artisan test --group=pdf`.
+- Status: M0–M5 and K9 done (storage, validation, data sources, compiler, Markdown/HTML/PDF, visual
+  designer with live preview, parameter-driven filters, sample data, export from the panel). Next is
+  M6 distribution. A Canva-like canvas designer is proposed as M8, pending decision K10 in
+  `Planning/05-keputusan-terbuka.md`. Relation fields cannot be sorted or filtered on.
 
 ## Laravel Boost
 
@@ -139,6 +150,10 @@ This application is a Laravel application running on PHP 8.5. You are an expert 
 Before relying on a package's API, confirm its installed version:
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
 - JS packages: check `package.json` for the installed versions.
+
+## Skills Activation
+
+This project has domain-specific skills available in `**/skills/**`. You MUST activate the relevant skill whenever you work in that domain—don't wait until you're stuck.
 
 ## Conventions
 
