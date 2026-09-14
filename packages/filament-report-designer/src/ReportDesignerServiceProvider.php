@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace ReportBrains\ReportDesigner;
 
 use Illuminate\Support\ServiceProvider;
+use ReportBrains\ReportDesigner\Commands\RenderReportCommand;
 use ReportBrains\ReportDesigner\Compiler\ReportCompiler;
 use ReportBrains\ReportDesigner\DataSources\DataSourceRegistry;
 use ReportBrains\ReportDesigner\DataSources\ReportQueryFactory;
 use ReportBrains\ReportDesigner\Expressions\ExpressionEvaluator;
 use ReportBrains\ReportDesigner\Expressions\ValueFormatter;
+use ReportBrains\ReportDesigner\Output\OutputFormats;
+use ReportBrains\ReportDesigner\Output\ReportManager;
 use ReportBrains\ReportDesigner\Schema\DocumentFields;
 use ReportBrains\ReportDesigner\Schema\ReportSchema;
 
@@ -35,6 +38,8 @@ class ReportDesignerServiceProvider extends ServiceProvider
         $this->app->singleton(ExpressionEvaluator::class);
         $this->app->singleton(ReportCompiler::class);
         $this->app->singleton(ReportRunner::class);
+        $this->app->singleton(OutputFormats::class);
+        $this->app->singleton(ReportManager::class);
     }
 
     public function boot(): void
@@ -46,6 +51,12 @@ class ReportDesignerServiceProvider extends ServiceProvider
             $this->publishes([
                 self::CONFIG_PATH => config_path('report-designer.php'),
             ], 'report-designer-config');
+
+            $this->publishesMigrations([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'report-designer-migrations');
+
+            $this->commands([RenderReportCommand::class]);
         }
     }
 }

@@ -5,22 +5,8 @@ milestone yang isinya hanya "menyiapkan struktur".
 
 Estimasi memakai satuan relatif (S/M/L), bukan tanggal, karena kecepatan pengerjaan belum diketahui.
 
-> **M0–M5 sudah selesai** — rinciannya di
+> **M0–M6 sudah selesai** — rinciannya di
 > [`Documentation/07-changelog.md`](../Documentation/07-changelog.md).
-
----
-
-## M6 — Runtime & distribusi · S
-
-- [ ] Facade `Report` dengan API lengkap
-- [ ] Artisan `report:render`
-- [ ] Job antrian untuk report besar
-- [ ] Ekspor XLSX/CSV (`openspout` sudah ikut terpasang bersama Filament)
-- [ ] Perbarui `Documentation/` untuk fitur M2–M6
-- [ ] Siapkan jalur distribusi berbayar (private Packagist / Anystack)
-- [ ] Tag rilis `v0.1.0`
-
-**Selesai bila:** plugin bisa dipasang di aplikasi Laravel+Filament lain dan langsung berfungsi.
 
 ---
 
@@ -54,13 +40,14 @@ Jenis dokumen kedua dengan kanvas bebas (posisi, ukuran, rotasi, lapisan), kelua
 
 ## Posisi sekarang
 
-Report sudah bisa dirancang visual, difilter dengan parameter, dan diekspor ke **PDF**, HTML, atau
-Markdown dari panel. Secara fitur, produk sudah lengkap untuk rilis pertama.
+**Kode siap dirilis sebagai v1.0.0.** Report dirancang visual, difilter dengan parameter, dan
+dijalankan dari panel, kode, antrian, maupun command line, ke PDF, Excel, CSV, HTML, atau Markdown.
+Package sudah terbukti bisa dipasang di aplikasi Laravel + Filament yang baru.
 
-Yang masih memisahkan dari **rilis berbayar pertama**:
+Yang tersisa sebelum bisa dijual semuanya **langkah Anda**, bukan kode:
 
-1. **M6 — jalur distribusi** (private Packagist/Anystack) dan API runtime yang rapi. Tanpa ini
-   produk tidak bisa dijual.
-2. **K8 — akses panel** di aplikasi demo sebelum dipakai untuk demo publik.
+1. Jalankan checklist di `06-rilis-dan-distribusi.md` (repo package, produk Anystack, tag v1.0.0).
+2. Putuskan **K11** — di mana dokumentasi untuk pembeli.
+3. **K8** — akses panel di aplikasi demo sebelum dipakai untuk demo publik.
 
-Editor kanvas ala Canva (M8) sebaiknya **setelah** rilis pertama, dan setelah K10 dijawab.
+Setelah rilis: M7 (fitur lanjutan) dan M8 (editor kanvas ala Canva, menunggu K10).

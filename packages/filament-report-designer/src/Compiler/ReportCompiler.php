@@ -71,7 +71,7 @@ class ReportCompiler
      *
      * @return array<int, RenderedBand>
      */
-    private function staticBand(BandName $name, array $definitions, EvaluationContext $context): array
+    private function staticBand(BandName $name, array $definitions, EvaluationContext $context, ?string $group = null): array
     {
         $blocks = $definitions[$name->value] ?? [];
 
@@ -79,13 +79,13 @@ class ReportCompiler
             return [];
         }
 
-        return [new RenderedBand($name, $this->compileBlocks($blocks, $context->rows, $context, repeatPerRow: false))];
+        return [new RenderedBand($name, $this->compileBlocks($blocks, $context->rows, $context, repeatPerRow: false), $group)];
     }
 
     /**
      * @return array<int, RenderedBand>
      */
-    private function detailBands(array $definitions, array $rows, EvaluationContext $context): array
+    private function detailBands(array $definitions, array $rows, EvaluationContext $context, ?string $group = null): array
     {
         $blocks = $definitions[BandName::Detail->value] ?? [];
 
@@ -93,7 +93,7 @@ class ReportCompiler
             return [];
         }
 
-        return [new RenderedBand(BandName::Detail, $this->compileBlocks($blocks, $rows, $context, repeatPerRow: true))];
+        return [new RenderedBand(BandName::Detail, $this->compileBlocks($blocks, $rows, $context, repeatPerRow: true), $group)];
     }
 
     /**
@@ -112,9 +112,9 @@ class ReportCompiler
 
             $bands = [
                 ...$bands,
-                ...$this->staticBand(BandName::GroupHeader, $definitions, $groupContext),
-                ...$this->detailBands($definitions, $groupRows, $groupContext),
-                ...$this->staticBand(BandName::GroupFooter, $definitions, $groupContext),
+                ...$this->staticBand(BandName::GroupHeader, $definitions, $groupContext, (string) $value),
+                ...$this->detailBands($definitions, $groupRows, $groupContext, (string) $value),
+                ...$this->staticBand(BandName::GroupFooter, $definitions, $groupContext, (string) $value),
             ];
         }
 
@@ -215,9 +215,20 @@ class ReportCompiler
             $rows,
         );
 
+        // Spreadsheets want the underlying values, so a total stays a number;
+        // documents want them formatted for reading. Both are kept.
+        $values = array_map(
+            fn (array $row): array => array_map(
+                fn (array $column): mixed => $row[$column['field']] ?? null,
+                $columns,
+            ),
+            $rows,
+        );
+
         return new RenderedBlock(BlockType::Table, [
             'columns' => $headers,
             'rows' => array_values($body),
+            'values' => array_values($values),
         ]);
     }
 

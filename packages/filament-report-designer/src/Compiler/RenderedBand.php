@@ -10,10 +10,12 @@ class RenderedBand
 {
     /**
      * @param  array<int, RenderedBlock>  $blocks
+     * @param  string|null  $group  The grouping value, when the band belongs to a group.
      */
     public function __construct(
         public readonly BandName $name,
         public readonly array $blocks,
+        public readonly ?string $group = null,
     ) {}
 
     public function isEmpty(): bool

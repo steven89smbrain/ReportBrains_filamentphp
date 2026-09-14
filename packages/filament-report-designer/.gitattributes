@@ -1,0 +1,4 @@
+# Keep the files buyers install limited to what the package needs.
+/tests            export-ignore
+/.gitattributes   export-ignore
+/.gitignore       export-ignore

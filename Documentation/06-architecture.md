@@ -42,10 +42,13 @@ packages/filament-report-designer/
     ├── DataSources/                Registry, whitelist, query factory
     ├── Expressions/                Sandboxed {{ }} evaluator and formatters
     ├── Compiler/                   Document + rows → RenderedReport
-    ├── Renderers/                  Markdown, HTML and PDF
+    ├── Renderers/                  Markdown, HTML, PDF, CSV and XLSX
+    ├── Output/                     Report facade backend, pending reports, format registry
+    ├── Jobs/ · Events/             Queued rendering and its completion event
+    ├── Commands/                   report:render
     ├── Designer/                   Form state ⇄ document mapping, live preview
     ├── Filament/                   The template resource and its pages
-    ├── Facades/ReportData.php
+    ├── Facades/                    Report, ReportData
     ├── Rules/                      Validation rules
     ├── Support/Scope.php           Resolves owner and tenant
     └── Exceptions/
@@ -138,6 +141,8 @@ designer makes.
 | Unexposed data via the designer or preview | Field pickers offer only whitelisted fields; saving and the preview both enforce the whitelist and scopes |
 | Script injection in rendered output | Markdown and HTML renderers escape every value |
 | Parameter values reaching SQL | Substituted only where a filter value is exactly one `{{ params.x }}` reference to a declared parameter, and always passed as a binding |
+| Unscoped reads outside a request | Queued jobs sign in as the requester and fail if that user no longer exists; the command offers `--as` |
+| Formula injection in spreadsheets | CSV prefixes formula-looking text with an apostrophe; XLSX writes all text as text cells |
 
 ## Database portability
 

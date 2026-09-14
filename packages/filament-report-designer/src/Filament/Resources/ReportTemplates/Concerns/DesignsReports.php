@@ -23,9 +23,8 @@ use ReportBrains\ReportDesigner\Exceptions\UnknownField;
 use ReportBrains\ReportDesigner\Exceptions\UnknownParameter;
 use ReportBrains\ReportDesigner\Exceptions\UnsupportedFeature;
 use ReportBrains\ReportDesigner\Filament\Resources\ReportTemplates\ReportTemplateResource;
+use ReportBrains\ReportDesigner\Output\OutputFormats;
 use ReportBrains\ReportDesigner\Renderers\Contracts\Renderer;
-use ReportBrains\ReportDesigner\Renderers\HtmlRenderer;
-use ReportBrains\ReportDesigner\Renderers\MarkdownRenderer;
 use ReportBrains\ReportDesigner\Renderers\PdfRenderer;
 use ReportBrains\ReportDesigner\ReportDesignerPlugin;
 use ReportBrains\ReportDesigner\ReportRunner;
@@ -129,7 +128,7 @@ trait DesignsReports
             ->modalSubmitActionLabel('Download')
             ->schema(fn (): array => [
                 ToggleButtons::make('format')
-                    ->options(['pdf' => 'PDF', 'html' => 'HTML', 'markdown' => 'Markdown'])
+                    ->options(app(OutputFormats::class)->labels())
                     ->default('pdf')
                     ->inline()
                     ->required(),
@@ -141,11 +140,7 @@ trait DesignsReports
             ->action(function (array $data): ?StreamedResponse {
                 $template = $this->getRecord();
 
-                $renderer = match ($data['format'] ?? 'pdf') {
-                    'html' => new HtmlRenderer,
-                    'markdown' => new MarkdownRenderer,
-                    default => app(PdfRenderer::class),
-                };
+                $renderer = app(OutputFormats::class)->renderer((string) ($data['format'] ?? 'pdf'));
 
                 try {
                     $content = app(ReportRunner::class)->render(

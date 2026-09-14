@@ -314,6 +314,12 @@ describe('exporting', function () {
         Pdf::assertSee('ada@example.com');
     });
 
+    it('downloads the saved report as a spreadsheet', function (string $format) {
+        Livewire::test(EditReportTemplate::class, ['record' => $this->template->getRouteKey()])
+            ->callAction('export', data: ['format' => $format])
+            ->assertFileDownloaded(($this->filename)($format));
+    })->with(['csv', 'xlsx']);
+
     it('explains a report it cannot run instead of failing', function () {
         // The email field was exposed when the template was saved, and since removed.
         ReportData::eloquent('users', User::class, function ($source): void {

@@ -4,6 +4,37 @@ Milestones as they complete. Roadmap for the unbuilt ones is in `Planning/04-roa
 
 ---
 
+## M6 — Runtime API, spreadsheets and release preparation · 14 Sep 2026
+
+Reports can now be run from anywhere, and the package is ready to ship as 1.0.0.
+
+**Running reports**
+- `Report` facade: `template()`, `file()` and `document()`; `with()` parameters; `toPdf()`,
+  `toHtml()`, `toMarkdown()`, `toCsv()`, `toXlsx()`; `save()` to any disk, `download()`, `queue()`
+- Queued renders run as the user who requested them, so data source scopes still apply, and fail
+  rather than read unscoped data if that user is gone. `ReportRendered` fires when the file is stored
+- `report:render` Artisan command with `--format`, `--output`, `--disk`, `--param`, `--as` and
+  `--queue`
+- `OutputFormats` registry: applications can add formats, which then appear in the facade, the
+  Export action and the command
+
+**Spreadsheets**
+- CSV and XLSX export the detail band's data rows with raw values, native numbers and dates, and a
+  `Group` column for grouped reports
+- Formula injection is blocked: CSV prefixes formula-looking text, and XLSX writes all text as text
+  cells, since openspout's shortcut would turn `=…` into a formula
+- The panel's Export action offers both
+
+**Release preparation**
+- Package `README.md` with the buyer installation flow through Anystack, `CHANGELOG.md` for 1.0.0,
+  export-ignore rules, publishable migrations, and `openspout/openspout` as an explicit dependency
+- Verified in a brand-new Laravel app: installed from a copied package, plugin registered, migrated,
+  and every format rendered with `report:render`
+
+**Tests** — 39 added (235 total).
+
+---
+
 ## M5 — PDF output · 14 Sep 2026
 
 Reports now print to PDF, and any template can be exported from the panel.

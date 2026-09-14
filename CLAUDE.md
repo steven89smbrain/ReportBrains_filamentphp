@@ -61,10 +61,21 @@ project, so treat the package as a distributable product rather than app code.
   only `PdfRenderer` swaps for Chrome's page counters. Anywhere else they must stay refused.
 - `PdfGenerationTest` prints a real PDF through Chrome and skips when no Chrome binary is found; run it
   alone with `php artisan test --group=pdf`.
-- Status: M0–M5 and K9 done (storage, validation, data sources, compiler, Markdown/HTML/PDF, visual
-  designer with live preview, parameter-driven filters, sample data, export from the panel). Next is
-  M6 distribution. A Canva-like canvas designer is proposed as M8, pending decision K10 in
-  `Planning/05-keputusan-terbuka.md`. Relation fields cannot be sorted or filtered on.
+- **Output formats are a registry** (`Output\OutputFormats`). The facade, the Export action and
+  `report:render` all resolve renderers through it — add a format there, never as a hard-coded `match`.
+- **Spreadsheets carry raw values**: `ReportCompiler` keeps both formatted `rows` and raw `values` on
+  table blocks. Never build XLSX cells with openspout's `Cell::fromValue()` — it turns text starting
+  with `=` into a formula. CSV neutralises formula-looking text instead.
+- **Code that runs outside a request has no signed-in user.** `RenderReport` signs in as the requester
+  and fails if they are gone; `report:render` takes `--as`. Keep both, or scopes read unscoped data.
+- **Artisan signatures parse braces anywhere**, including option descriptions: `{date}` in a
+  description becomes a required argument and breaks the command.
+- **The package ships from a separate repository** via `git subtree split` (Anystack requires
+  `composer.json` at the repo root). Release steps: `Planning/06-rilis-dan-distribusi.md`. Keep
+  `packages/filament-report-designer/CHANGELOG.md` current.
+- Status: M0–M6 done — code ready to release as v1.0.0 through Anystack. Remaining release steps are the
+  owner's (accounts, repository, pricing). Open decisions: K11 buyer documentation location, K10 canvas
+  designer scope, K8 demo panel access.
 
 ## Laravel Boost
 

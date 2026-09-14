@@ -13,6 +13,9 @@ Dicatat supaya alasannya tidak hilang dan tidak dibahas ulang.
 | K7 | **Eloquent dulu, di balik interface** | `DataSource` adalah interface yang bicara dalam baris, bukan query builder. Sumber view/stored procedure/API bisa ditambah tanpa merombak |
 | K3 | **PDF lewat spatie/laravel-pdf (MIT), driver Chromium sebagai rekomendasi** — `chrome` bawaan; `browsershot`, `gotenberg`, `dompdf` bisa dipilih lewat config | Semua open source tanpa langganan. Chromium dipilih karena editor berjalan di browser: PDF yang dicetak mesin browser sama persis dengan preview, dan mendukung CSS modern (posisi bebas, rotasi, flex/grid) yang dibutuhkan editor ala Canva. Dikecualikan: mPDF (GPL-2.0-only, berisiko untuk plugin berbayar) dan Cloudflare (layanan berbayar). Package hanya *menyarankan* driver, pembeli memilih sesuai servernya |
 | K9 | **Filter merujuk parameter** (`{{ params.x }}`), parameter tetap didefinisikan developer di sumber data | `params` di dokumen dihapus. Filter berparameter kosong dilewati; tanggal vs kolom datetime mencakup sehari penuh. Editor punya pilihan "Compare with" dan input parameter untuk preview |
+| — | **Distribusi lewat Anystack Exclusive** ($0/bulan, potongan 15%) | Checkout Stripe, pajak, lisensi, dan repository Composer privat ditangani Anystack. Langkah rilis di `06-rilis-dan-distribusi.md` |
+| — | **Package di repository GitHub terpisah** | Anystack mewajibkan `composer.json` di root repo. Pengembangan tetap di repo ini; package dipisah dengan `git subtree split` |
+| — | **Rilis pertama v1.0.0** | Semver berlaku: perubahan yang merusak API hanya di versi mayor berikutnya |
 | — | **Dukung MySQL + PostgreSQL + SQLite** | Kolom `json` Laravel yang portabel; tidak memakai operator JSON spesifik vendor |
 
 ## Masih terbuka
@@ -77,3 +80,16 @@ Pertanyaan yang perlu dijawab sebelum membangun:
 
 Rekomendasi awal: mulai dari **kanvas satu halaman yang terikat data** (sertifikat/faktur/label),
 karena itu yang paling membedakan produk dari plugin report biasa.
+
+---
+
+### K11 — Dokumentasi untuk pembeli disimpan di mana? · sebaiknya sebelum rilis
+
+`Documentation/` ada di repo aplikasi ini, yang **tidak** ikut ke repo package. Pembeli saat ini hanya
+mendapat README package. Pilihan:
+
+| Opsi | Kelebihan | Kekurangan |
+|---|---|---|
+| **Ikut di repo package** (mis. folder `docs/`) | Pembeli langsung dapat, versinya selalu cocok dengan kode | Hanya bisa dibaca setelah membeli |
+| Situs dokumentasi publik | Membantu penjualan: calon pembeli bisa menilai sebelum membeli | Perlu hosting dan dirawat terpisah |
+| Keduanya | Terbaik untuk penjualan dan pembeli | Paling banyak pekerjaan |

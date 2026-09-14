@@ -11,11 +11,29 @@
 
 ## Installing the package
 
-> **Note:** the package is not published to a repository yet. Distribution is still an
-> open decision — see `Planning/05-keputusan-terbuka.md`. Until then, install it from a
-> local path as described under *Development setup* below.
+The package is sold through [Anystack](https://anystack.sh). A purchase comes with a licence
+key, which is also the password for the private Composer repository.
 
-Once distribution is set up, installation will be:
+Add the repository:
+
+```bash
+composer config repositories.report-designer composer https://report-designer.composer.sh
+```
+
+Save your credentials — the username is the email address used for the purchase, the password is
+the licence key:
+
+```bash
+composer config --auth http-basic.report-designer.composer.sh you@example.com YOUR-LICENCE-KEY
+```
+
+If a licence was issued without an email address, the username is `unlock`.
+
+This writes to `auth.json` in the project. **Keep `auth.json` out of version control**; on CI and
+production servers, provide the same credentials through the `COMPOSER_AUTH` environment variable
+instead.
+
+Then install:
 
 ```bash
 composer require reportbrains/filament-report-designer

@@ -22,6 +22,7 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | [09 — Expressions and rendering](09-expressions-and-rendering.md) | The `{{ }}` language, formatting, and the Markdown/HTML renderers |
 | [10 — The visual designer](10-visual-designer.md) | Designing reports in the panel, with live preview |
 | [11 — PDF output](11-pdf-output.md) | Drivers, page setup, page numbers and exporting |
+| [12 — Running reports from code](12-running-reports.md) | The `Report` facade, CSV and Excel, queueing and `report:render` |
 
 ## What works today
 
@@ -42,7 +43,8 @@ are rendered to Markdown, HTML, PDF or spreadsheets.
 | Sandboxed `{{ }}` expressions and aggregates | ✅ Working |
 | Grouping with subtotals and grand totals | ✅ Working |
 | PDF output with page headers, footers and page numbers | ✅ Working |
-| Export to PDF, HTML or Markdown from the panel | ✅ Working |
+| Export to PDF, HTML, Markdown, CSV or Excel from the panel | ✅ Working |
+| `Report` facade, `report:render` command and queued rendering | ✅ Working |
 
 Planning documents for the unbuilt milestones live in `Planning/`.
 
