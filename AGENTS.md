@@ -71,12 +71,16 @@ project, so treat the package as a distributable product rather than app code.
   and fails if they are gone; `report:render` takes `--as`. Keep both, or scopes read unscoped data.
 - **Artisan signatures parse braces anywhere**, including option descriptions: `{date}` in a
   description becomes a required argument and breaks the command.
+- **`Documentation/` is the only source of the docs, and it ships twice.** `composer docs:sync` copies it
+  into `packages/filament-report-designer/docs` (without `.vitepress`) so buyers get it in the release
+  repository, and `PackageDocsTest` fails when the copy is stale — run the sync after editing docs. The
+  public site is VitePress, configured in `Documentation/.vitepress/config.mts`, deployed by
+  `.github/workflows/docs.yml`; add new pages to that sidebar too.
 - **The package ships from a separate repository** via `git subtree split` (Anystack requires
   `composer.json` at the repo root). Release steps: `Planning/06-rilis-dan-distribusi.md`. Keep
   `packages/filament-report-designer/CHANGELOG.md` current.
 - Status: M0–M6 done — code ready to release as v1.0.0 through Anystack. Remaining release steps are the
-  owner's (accounts, repository, pricing). Open decisions: K11 buyer documentation location, K10 canvas
-  designer scope, K8 demo panel access.
+  owner's (accounts, repository, pricing). Open decisions: K10 canvas designer scope, K8 demo panel access.
 
 ## Laravel Boost
 

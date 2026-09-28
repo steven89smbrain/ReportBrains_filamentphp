@@ -43,6 +43,11 @@ First release.
 - `report:render` Artisan command, schedulable, with parameters and `--as`
 - Register custom output formats
 
+### Documentation
+
+- Full guides included in `docs/`: installation, quick start, the visual designer, data sources,
+  expressions, PDF output, running reports from code, configuration and architecture
+
 ### Requirements
 
 - PHP 8.3+, Laravel 13, Filament 5

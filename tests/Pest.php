@@ -45,6 +45,34 @@ expect()->extend('toBeOne', function () {
 */
 
 /**
+ * Every file in a directory, keyed by relative path, with its content hash.
+ *
+ * @return array<string, string>
+ */
+function contentsOf(string $directory): array
+{
+    $files = [];
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS),
+    );
+
+    foreach ($iterator as $file) {
+        $relative = substr($file->getPathname(), strlen($directory) + 1);
+
+        // Dot-prefixed paths — the documentation site's own config — are not shipped.
+        if (str_starts_with($relative, '.') || str_contains($relative, '/.')) {
+            continue;
+        }
+
+        $files[$relative] = (string) md5_file($file->getPathname());
+    }
+
+    ksort($files);
+
+    return $files;
+}
+
+/**
  * A minimal report document that passes schema validation.
  *
  * Tests override only the part they are about, so a failure points at the

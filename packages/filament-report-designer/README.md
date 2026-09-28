@@ -91,6 +91,12 @@ Report::template('monthly-sales')->queue('reports/2026.pdf');
 php artisan report:render monthly-sales --output=reports/september.pdf --param=from=2026-09-01
 ```
 
+## Documentation
+
+The full guides ship with this package in [`docs/`](docs/README.md) — installation, the visual
+designer, data sources, expressions, PDF output and running reports from code. They are also
+published online; the address is on the product page.
+
 ## Licence
 
 Commercial. One licence covers one project, including its staging and development copies. See

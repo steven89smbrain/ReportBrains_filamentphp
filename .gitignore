@@ -13,6 +13,8 @@
 /.vscode
 /.zed
 /auth.json
+/Documentation/.vitepress/cache
+/Documentation/.vitepress/dist
 /node_modules
 /public/build
 /public/css/filament

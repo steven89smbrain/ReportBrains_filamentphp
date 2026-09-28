@@ -16,6 +16,7 @@ Dicatat supaya alasannya tidak hilang dan tidak dibahas ulang.
 | — | **Distribusi lewat Anystack Exclusive** ($0/bulan, potongan 15%) | Checkout Stripe, pajak, lisensi, dan repository Composer privat ditangani Anystack. Langkah rilis di `06-rilis-dan-distribusi.md` |
 | — | **Package di repository GitHub terpisah** | Anystack mewajibkan `composer.json` di root repo. Pengembangan tetap di repo ini; package dipisah dengan `git subtree split` |
 | — | **Rilis pertama v1.0.0** | Semver berlaku: perubahan yang merusak API hanya di versi mayor berikutnya |
+| K11 | **Dokumentasi di dua tempat: ikut di package dan situs publik** | `Documentation/` tetap satu-satunya sumber. `composer docs:sync` menyalinnya ke `packages/filament-report-designer/docs` (tanpa `.vitepress`), dan `PackageDocsTest` gagal kalau kedua salinan berbeda. Situs publik dibangun VitePress dari folder yang sama, dideploy ke GitHub Pages lewat `.github/workflows/docs.yml` |
 | — | **Dukung MySQL + PostgreSQL + SQLite** | Kolom `json` Laravel yang portabel; tidak memakai operator JSON spesifik vendor |
 
 ## Masih terbuka
@@ -82,14 +83,3 @@ Rekomendasi awal: mulai dari **kanvas satu halaman yang terikat data** (sertifik
 karena itu yang paling membedakan produk dari plugin report biasa.
 
 ---
-
-### K11 — Dokumentasi untuk pembeli disimpan di mana? · sebaiknya sebelum rilis
-
-`Documentation/` ada di repo aplikasi ini, yang **tidak** ikut ke repo package. Pembeli saat ini hanya
-mendapat README package. Pilihan:
-
-| Opsi | Kelebihan | Kekurangan |
-|---|---|---|
-| **Ikut di repo package** (mis. folder `docs/`) | Pembeli langsung dapat, versinya selalu cocok dengan kode | Hanya bisa dibaca setelah membeli |
-| Situs dokumentasi publik | Membantu penjualan: calon pembeli bisa menilai sebelum membeli | Perlu hosting dan dirawat terpisah |
-| Keduanya | Terbaik untuk penjualan dan pembeli | Paling banyak pekerjaan |

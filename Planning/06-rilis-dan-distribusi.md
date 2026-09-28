@@ -55,10 +55,23 @@ yang sama bisa diulang di setiap rilis.
       simpan kredensial, `composer require`, migrate, daftarkan plugin.
 - [ ] Buka Report Templates, buat report, ekspor PDF.
 
+### 5. Situs dokumentasi publik
+
+- [ ] Di GitHub repo ini: **Settings → Pages → Source: GitHub Actions**.
+- [ ] Push ke `main` menjalankan `.github/workflows/docs.yml`; situs terbit di
+      `https://steven89smbrain.github.io/ReportBrains_filamentphp/`.
+- [ ] Kalau ingin domain sendiri (mis. `docs.reportbrains.com`), tambahkan berkas `CNAME` dan atur DNS,
+      lalu ubah `DOCS_BASE` di workflow menjadi `/`.
+- [ ] Setelah situs hidup, tautkan alamatnya di README package (bagian *Documentation*) dan di halaman
+      produk Anystack.
+
+Dokumentasi untuk pembeli sudah ikut di dalam package (`docs/`), hasil `composer docs:sync`. Jalankan
+perintah itu setiap kali `Documentation/` berubah — `PackageDocsTest` akan gagal kalau terlupa.
+
 ## Rilis berikutnya
 
 1. Kembangkan dan uji di repo ini seperti biasa.
-2. Perbarui `packages/filament-report-designer/CHANGELOG.md`.
+2. Perbarui `packages/filament-report-designer/CHANGELOG.md`, lalu jalankan `composer docs:sync`.
 3. Jalankan lagi perintah push di langkah 1. `git subtree split` menghasilkan riwayat yang konsisten,
    jadi push berikutnya hanya menambah commit baru.
 4. Buat GitHub release dengan tag versi baru. Perubahan yang merusak = versi mayor baru.
