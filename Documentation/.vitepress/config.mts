@@ -6,22 +6,23 @@ const base = process.env.DOCS_BASE ?? '/'
 
 export default defineConfig({
     base,
-    // These pages document a report syntax that also uses {{ }}. Vue would try to
-    // evaluate those as interpolations and fail on expressions such as
-    // {{ sum(total) | currency }}, so the templates use different delimiters.
-    vue: {
-        template: {
-            compilerOptions: {
-                delimiters: ['{@{@', '@}@}'],
-            },
-        },
-    },
     lang: 'en',
     title: 'Report Designer',
     description: 'Design reports visually in Filament, and export them as PDF, Excel, CSV, HTML or Markdown.',
     cleanUrls: true,
     // Documentation/README.md is the index in the repository; serve it as the home page.
     rewrites: { 'README.md': 'index.md' },
+    markdown: {
+        config(md) {
+            // These pages document a syntax that also uses {{ }}, and VitePress only
+            // escapes fenced code blocks — inline code is compiled by Vue, which turns
+            // `{{ params.from }}` into an empty interpolation and fails outright on
+            // `{{ sum(total) | currency }}`. Marking inline code v-pre keeps it literal.
+            // The theme's own templates are untouched by this.
+            md.renderer.rules.code_inline = (tokens, idx) =>
+                `<code v-pre>${md.utils.escapeHtml(tokens[idx].content)}</code>`
+        },
+    },
     themeConfig: {
         nav: [
             { text: 'Documentation', link: '/01-installation' },
